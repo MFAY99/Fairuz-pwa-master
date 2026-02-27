@@ -1,0 +1,3931 @@
+﻿<!DOCTYPE html>
+<html lang="id" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyclone Separator Pro - CFD & Design Tool</title>
+    <meta name="description"
+        content="Cyclone Separator Pro untuk simulasi desain cyclone separator, analisis efisiensi, dan visualisasi 3D.">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cyclone Pro">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
+    <link rel="stylesheet" href="./assets/tailwind.css">
+    <link rel="preload" href="./vendor/three.min.js" as="script">
+    <link rel="preload" href="./vendor/OrbitControls.js" as="script">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" defer></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .glass-panel {
+            backdrop-filter: blur(12px);
+        }
+
+        /* 3D Container responsive styling */
+        #three-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            inset: 0;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            min-height: 50vh;
+            flex-grow: 1;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        @media (min-width: 1024px) {
+            .canvas-wrapper {
+                min-height: 600px;
+            }
+        }
+
+        html.dark .canvas-wrapper {
+            background: linear-gradient(135deg, #1e293b 0%, #020617 100%);
+            box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.8);
+        }
+
+        html:not(.dark) .canvas-wrapper {
+            background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
+            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.1);
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .input-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #475569;
+        }
+
+        html.dark .input-label {
+            color: #cbd5e1;
+        }
+
+        .custom-input {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            border: 1px solid #cbd5e1;
+            background-color: #f8fafc;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        html.dark .custom-input {
+            border-color: #334155;
+            background-color: #0f172a;
+            color: white;
+        }
+
+        .custom-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        .custom-input:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Step-by-Step button theming */
+        :root {
+            --step-btn-bg: #f1f5f9;
+            --step-btn-border: #cbd5e1;
+            --step-btn-text: #334155;
+            --step-btn-icon: #3b82f6;
+        }
+
+        html.dark {
+            --step-btn-bg: #1e293b;
+            --step-btn-border: #334155;
+            --step-btn-text: #e2e8f0;
+            --step-btn-icon: #60a5fa;
+        }
+
+        /* Missing Tailwind utility classes not in pre-compiled tailwind.css */
+        .text-\[11px\] {
+            font-size: 11px;
+        }
+
+        .h-48 {
+            height: 12rem;
+        }
+
+        .h-\[300px\] {
+            height: 300px;
+        }
+
+        .h-\[400px\] {
+            height: 400px;
+        }
+
+        .max-h-\[50vh\] {
+            max-height: 50vh;
+        }
+
+        .max-w-6xl {
+            max-width: 72rem;
+        }
+
+        .inset-x-0 {
+            left: 0;
+            right: 0;
+        }
+
+        .top-14 {
+            top: 3.5rem;
+        }
+
+        .top-16 {
+            top: 4rem;
+        }
+
+        .right-4 {
+            right: 1rem;
+        }
+
+        .z-30 {
+            z-index: 30;
+        }
+
+        .rounded-t {
+            border-top-left-radius: 0.25rem;
+            border-top-right-radius: 0.25rem;
+        }
+
+        .cursor-not-allowed {
+            cursor: not-allowed;
+        }
+
+        .opacity-50 {
+            opacity: 0.5;
+        }
+
+        .opacity-60 {
+            opacity: 0.6;
+        }
+
+        .mb-1 {
+            margin-bottom: 0.25rem;
+        }
+
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .ml-2 {
+            margin-left: 0.5rem;
+        }
+
+        .pl-3 {
+            padding-left: 0.75rem;
+        }
+
+        .border-l-2 {
+            border-left-width: 2px;
+        }
+
+        .border-l-4 {
+            border-left-width: 4px;
+        }
+
+        .truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .w-10 {
+            width: 2.5rem;
+        }
+
+        .w-auto {
+            width: auto;
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+        }
+
+        .text-3xl {
+            font-size: 1.875rem;
+            line-height: 2.25rem;
+        }
+
+        .disabled\:opacity-50:disabled {
+            opacity: 0.5;
+        }
+
+        .disabled\:cursor-not-allowed:disabled {
+            cursor: not-allowed;
+        }
+
+        .disabled\:text-slate-500:disabled {
+            color: #64748b;
+        }
+
+        .disabled\:bg-slate-200:disabled {
+            background-color: #e2e8f0;
+        }
+
+        .dark .disabled\:text-slate-400:disabled {
+            color: #94a3b8;
+        }
+
+        .dark .disabled\:bg-slate-800:disabled {
+            background-color: #1e293b;
+        }
+
+        .border-blue-200 {
+            border-color: #bfdbfe;
+        }
+
+        .border-blue-500 {
+            border-color: #3b82f6;
+        }
+
+        .border-blue-800 {
+            border-color: #1e40af;
+        }
+
+        .border-purple-200 {
+            border-color: #e9d5ff;
+        }
+
+        .border-pink-200 {
+            border-color: #fbcfe8;
+        }
+
+        .border-orange-200 {
+            border-color: #fed7aa;
+        }
+
+        html.dark .border-blue-200 {
+            border-color: #1e3a5f;
+        }
+
+        html.dark .border-orange-200 {
+            border-color: #7c2d12;
+        }
+
+        html.dark .border-purple-200 {
+            border-color: #581c87;
+        }
+
+        html.dark .border-pink-200 {
+            border-color: #831843;
+        }
+
+        .text-purple-600 {
+            color: #9333ea;
+        }
+
+        .text-purple-700 {
+            color: #7e22ce;
+        }
+
+        .text-purple-300 {
+            color: #d8b4fe;
+        }
+
+        .text-pink-600 {
+            color: #db2777;
+        }
+
+        .text-pink-700 {
+            color: #be185d;
+        }
+
+        .text-pink-300 {
+            color: #f9a8d4;
+        }
+
+        .text-pink-400 {
+            color: #f472b6;
+        }
+
+        .dark .text-purple-400 {
+            color: #c084fc;
+        }
+
+        .dark .text-purple-300 {
+            color: #d8b4fe;
+        }
+
+        .dark .text-pink-400 {
+            color: #f472b6;
+        }
+
+        .dark .text-pink-300 {
+            color: #f9a8d4;
+        }
+
+        .text-emerald-400 {
+            color: #34d399;
+        }
+
+        .border-emerald-300\/40 {
+            border-color: rgba(110, 231, 183, 0.4);
+        }
+
+        .bg-purple-100 {
+            background-color: #f3e8ff;
+        }
+
+        .text-purple-700 {
+            color: #7e22ce;
+        }
+
+        .dark .bg-purple-900\/30 {
+            background-color: rgba(88, 28, 135, 0.3);
+        }
+
+        .dark .text-purple-300 {
+            color: #d8b4fe;
+        }
+
+        .hover\:bg-purple-200:hover {
+            background-color: #e9d5ff;
+        }
+
+        .dark .hover\:bg-purple-900\/50:hover {
+            background-color: rgba(88, 28, 135, 0.5);
+        }
+
+        .hover\:bg-red-100:hover {
+            background-color: #fee2e2;
+        }
+
+        .dark .hover\:bg-red-900\/30:hover {
+            background-color: rgba(127, 29, 29, 0.3);
+        }
+
+        .bg-amber-100 {
+            background-color: #fef3c7;
+        }
+
+        .text-amber-700 {
+            color: #b45309;
+        }
+
+        .dark .bg-amber-900\/30 {
+            background-color: rgba(120, 53, 15, 0.3);
+        }
+
+        .dark .text-amber-400 {
+            color: #fbbf24;
+        }
+
+        .bg-orange-100 {
+            background-color: #ffedd5;
+        }
+
+        .dark .bg-orange-900\/30 {
+            background-color: rgba(124, 45, 18, 0.3);
+        }
+
+        .dark .text-orange-300 {
+            color: #fdba74;
+        }
+
+        .text-orange-700 {
+            color: #c2410c;
+        }
+
+        @media (min-width:768px) {
+            .md\:h-64 {
+                height: 16rem;
+            }
+
+            .md\:h-\[400px\] {
+                height: 400px;
+            }
+
+            .md\:grid-cols-2 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (min-width:1024px) {
+            .lg\:grid-cols-3 {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (min-width:640px) {
+            .sm\:top-auto {
+                top: auto;
+            }
+
+            .sm\:bottom-0 {
+                bottom: 0;
+            }
+        }
+
+        details>summary {
+            list-style: none;
+        }
+
+        details>summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details>summary::before {
+            content: '▸ ';
+        }
+
+        details[open]>summary::before {
+            content: '▾ ';
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        html.dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+
+        /* Header responsiveness fallback (tailwind.css in this project lacks sm:flex/sm:hidden) */
+        .header-actions-desktop {
+            display: flex;
+        }
+
+        .header-actions-mobile {
+            display: none;
+        }
+
+        .mobile-only-layer {
+            display: none !important;
+        }
+
+        @media (max-width: 767px) {
+            .header-actions-desktop {
+                display: none;
+            }
+
+            .header-actions-mobile {
+                display: flex;
+            }
+
+            .mobile-only-layer {
+                display: block !important;
+            }
+
+            .mobile-drawer-backdrop {
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.2s ease;
+            }
+
+            .mobile-drawer-backdrop.is-open {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            .mobile-drawer-panel {
+                top: 0;
+                right: 0;
+                bottom: 0;
+                width: min(84vw, 320px);
+                border-radius: 0;
+                border-left-width: 1px;
+                border-left-color: #e2e8f0;
+                transform: translateX(100%);
+                transition: transform 0.25s ease;
+                padding-top: 72px;
+            }
+
+            html.dark .mobile-drawer-panel {
+                border-left-color: #334155;
+            }
+
+            .mobile-drawer-panel.is-open {
+                transform: translateX(0);
+            }
+
+            body.drawer-open {
+                overflow: hidden;
+            }
+        }
+
+        .mobile-drawer-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .mobile-drawer-action {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 0.875rem;
+            border-radius: 0.75rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            border: 1px solid transparent;
+            transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+        }
+
+        .mobile-drawer-action:active {
+            transform: scale(0.98);
+        }
+
+        .mobile-drawer-action-left {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        .mobile-drawer-icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.45rem;
+            flex-shrink: 0;
+        }
+
+        .mobile-drawer-action-install {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+        }
+
+        .mobile-drawer-action-install:hover {
+            background: #1d4ed8;
+        }
+
+        .mobile-drawer-action-install .mobile-drawer-icon {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+        }
+
+        .mobile-drawer-action-history {
+            background: #e2e8f0;
+            color: #1e293b;
+            border-color: #cbd5e1;
+        }
+
+        .mobile-drawer-action-history:hover {
+            background: #cbd5e1;
+        }
+
+        .mobile-drawer-action-history .mobile-drawer-icon {
+            background: #cbd5e1;
+            color: #334155;
+        }
+
+        html.dark .mobile-drawer-action-history {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-color: #334155;
+        }
+
+        html.dark .mobile-drawer-action-history:hover {
+            background: #334155;
+        }
+
+        html.dark .mobile-drawer-action-history .mobile-drawer-icon {
+            background: #334155;
+            color: #e2e8f0;
+        }
+
+        .mobile-drawer-count {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #475569;
+        }
+
+        html.dark .mobile-drawer-count {
+            color: #cbd5e1;
+        }
+
+        .loaded-record-actions {
+            margin-top: 0.5rem;
+            gap: 0.5rem;
+        }
+
+        .loaded-record-btn {
+            flex: 1 1 0%;
+            padding: 0.625rem 0.75rem;
+            border-radius: 0.75rem;
+            border: 1px solid transparent;
+            color: #ffffff;
+            font-size: 0.875rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.375rem;
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+            box-shadow: 0 4px 10px rgba(2, 6, 23, 0.18);
+        }
+
+        .loaded-record-btn:active {
+            transform: scale(0.985);
+        }
+
+        .loaded-record-btn-update {
+            background: #f59e0b;
+            border-color: #d97706;
+        }
+
+        .loaded-record-btn-update:hover {
+            background: #d97706;
+        }
+
+        .loaded-record-btn-new {
+            background: #059669;
+            border-color: #047857;
+        }
+
+        .loaded-record-btn-new:hover {
+            background: #047857;
+        }
+
+        html.dark .loaded-record-btn-update {
+            background: #d97706;
+            border-color: #b45309;
+        }
+
+        html.dark .loaded-record-btn-update:hover {
+            background: #b45309;
+        }
+
+        html.dark .loaded-record-btn-new {
+            background: #0d9488;
+            border-color: #0f766e;
+        }
+
+        html.dark .loaded-record-btn-new:hover {
+            background: #0f766e;
+        }
+
+        .history-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .history-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.45rem 0.7rem;
+            border-radius: 0.6rem;
+            border: 1px solid transparent;
+            font-size: 0.75rem;
+            font-weight: 700;
+            line-height: 1;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+
+        .history-btn svg {
+            width: 0.95rem;
+            height: 0.95rem;
+            flex-shrink: 0;
+        }
+
+        .history-btn-neutral {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+            color: #334155;
+        }
+
+        .history-btn-neutral:hover {
+            background: #cbd5e1;
+        }
+
+        .history-btn-purple {
+            background: #ede9fe;
+            border-color: #ddd6fe;
+            color: #6d28d9;
+        }
+
+        .history-btn-purple:hover {
+            background: #ddd6fe;
+        }
+
+        .history-btn-emerald {
+            background: #d1fae5;
+            border-color: #a7f3d0;
+            color: #065f46;
+        }
+
+        .history-btn-emerald:hover {
+            background: #a7f3d0;
+        }
+
+        .history-btn-sky {
+            background: #e0f2fe;
+            border-color: #bae6fd;
+            color: #075985;
+        }
+
+        .history-btn-sky:hover {
+            background: #bae6fd;
+        }
+
+        .history-btn-red {
+            background: #fee2e2;
+            border-color: #fecaca;
+            color: #b91c1c;
+        }
+
+        .history-btn-red:hover {
+            background: #fecaca;
+        }
+
+        .history-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        html.dark .history-btn-neutral {
+            background: #1e293b;
+            border-color: #334155;
+            color: #cbd5e1;
+        }
+
+        html.dark .history-btn-neutral:hover {
+            background: #334155;
+        }
+
+        html.dark .history-btn-purple {
+            background: rgba(88, 28, 135, 0.32);
+            border-color: rgba(107, 33, 168, 0.45);
+            color: #ddd6fe;
+        }
+
+        html.dark .history-btn-purple:hover {
+            background: rgba(107, 33, 168, 0.42);
+        }
+
+        html.dark .history-btn-emerald {
+            background: rgba(6, 95, 70, 0.32);
+            border-color: rgba(16, 185, 129, 0.42);
+            color: #a7f3d0;
+        }
+
+        html.dark .history-btn-emerald:hover {
+            background: rgba(6, 95, 70, 0.5);
+        }
+
+        html.dark .history-btn-sky {
+            background: rgba(12, 74, 110, 0.34);
+            border-color: rgba(14, 116, 144, 0.42);
+            color: #bae6fd;
+        }
+
+        html.dark .history-btn-sky:hover {
+            background: rgba(12, 74, 110, 0.5);
+        }
+
+        html.dark .history-btn-red {
+            background: rgba(127, 29, 29, 0.35);
+            border-color: rgba(220, 38, 38, 0.38);
+            color: #fecaca;
+        }
+
+        html.dark .history-btn-red:hover {
+            background: rgba(127, 29, 29, 0.55);
+        }
+
+
+        .history-row-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .history-row-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.3rem 0.45rem;
+            border-radius: 0.5rem;
+            border: 1px solid transparent;
+            font-size: 0.72rem;
+            font-weight: 700;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .history-row-btn svg {
+            width: 0.85rem;
+            height: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .history-row-btn-load {
+            background: #dbeafe;
+            border-color: #bfdbfe;
+            color: #1d4ed8;
+        }
+
+        .history-row-btn-load:hover {
+            background: #bfdbfe;
+        }
+
+        .history-row-btn-delete {
+            background: #fee2e2;
+            border-color: #fecaca;
+            color: #b91c1c;
+        }
+
+        .history-row-btn-delete:hover {
+            background: #fecaca;
+        }
+
+        html.dark .history-row-btn-load {
+            background: rgba(30, 58, 138, 0.3);
+            border-color: rgba(59, 130, 246, 0.45);
+            color: #93c5fd;
+        }
+
+        html.dark .history-row-btn-load:hover {
+            background: rgba(30, 58, 138, 0.5);
+        }
+
+        html.dark .history-row-btn-delete {
+            background: rgba(127, 29, 29, 0.35);
+            border-color: rgba(220, 38, 38, 0.38);
+            color: #fca5a5;
+        }
+
+        html.dark .history-row-btn-delete:hover {
+            background: rgba(127, 29, 29, 0.55);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+
+    <!-- Top Header (Sticky) -->
+    <header
+        class="sticky top-0 z-40 w-full flex-shrink-0 flex items-center justify-between px-4 md:px-6 py-3 border-b border-slate-300 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-sm">
+        <div>
+            <h1 class="text-lg md:text-xl font-extrabold tracking-tight flex items-center gap-2">
+                <svg aria-hidden="true" class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                    </path>
+                </svg>
+                <span class="text-blue-600 dark:text-blue-500">Cyclone</span> <span class="hidden sm:inline">Pro</span>
+            </h1>
+        </div>
+        <div class="flex items-center gap-2 md:gap-3">
+            <div class="header-actions-desktop items-center gap-2 md:gap-3">
+                <button id="install-app-btn" data-install-app
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs md:text-sm font-semibold transition-colors">
+                    Install / Download
+                </button>
+                <button onclick="toggleHistoryModal()"
+                    class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg text-xs md:text-sm font-semibold transition-colors border border-slate-200 dark:border-slate-700">
+                    <svg aria-hidden="true" class="w-4 h-4 hidden sm:block" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    History (<span data-history-count>0</span>)
+                </button>
+            </div>
+            <button onclick="toggleTheme()" aria-label="Ganti tema terang atau gelap"
+                class="p-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                <svg aria-hidden="true" id="icon-sun" class="w-5 h-5 hidden dark:block text-yellow-400" fill="none"
+                    stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                    </path>
+                </svg>
+                <svg aria-hidden="true" id="icon-moon" class="w-5 h-5 block dark:hidden text-slate-700" fill="none"
+                    stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                    </path>
+                </svg>
+            </button>
+            <span id="storage-status"
+                class="hidden lg:inline-flex px-2.5 py-1 text-xs font-semibold rounded-md border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-amber-700 dark:text-amber-400">Storage:
+                standar browser</span>
+            <div class="header-actions-mobile items-center gap-2">
+                <button id="mobile-menu-btn" onclick="toggleMobileActionMenu()" aria-label="Buka menu aksi"
+                    aria-expanded="false"
+                    class="p-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                    <svg aria-hidden="true" class="w-5 h-5 text-slate-700 dark:text-slate-200" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div id="mobile-action-backdrop" class="mobile-only-layer mobile-drawer-backdrop fixed inset-0 z-40 bg-slate-900/50"
+        onclick="toggleMobileActionMenu(false)"></div>
+    <div id="mobile-action-menu"
+        class="mobile-only-layer mobile-drawer-panel fixed z-50 bg-white dark:bg-slate-900 shadow-2xl p-4"
+        aria-hidden="true">
+        <div class="flex items-center justify-between mb-3">
+            <p class="text-sm font-bold text-slate-700 dark:text-slate-200">Menu Cepat</p>
+            <button type="button" onclick="toggleMobileActionMenu(false)" aria-label="Tutup menu aksi"
+                class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                <svg aria-hidden="true" class="w-4 h-4 text-slate-700 dark:text-slate-200" fill="none"
+                    stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+        </div>
+        <div class="mobile-drawer-actions">
+            <button id="install-app-btn-mobile" data-install-app type="button"
+                class="mobile-drawer-action mobile-drawer-action-install">
+                <span class="mobile-drawer-action-left">
+                    <span class="mobile-drawer-icon">
+                        <svg aria-hidden="true" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4"></path>
+                        </svg>
+                    </span>
+                    <span>Install / Download</span>
+                </span>
+                <svg aria-hidden="true" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </button>
+            <button type="button" onclick="openHistoryFromMobileMenu()"
+                class="mobile-drawer-action mobile-drawer-action-history">
+                <span class="mobile-drawer-action-left">
+                    <span class="mobile-drawer-icon">
+                        <svg aria-hidden="true" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </span>
+                    <span>History</span>
+                </span>
+                <span class="mobile-drawer-count">(<span data-history-count>0</span>)</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Layout Container -->
+    <div class="flex-grow flex flex-col md:flex-row w-full max-w-[1600px] mx-auto">
+
+        <!-- Sidebar (Input Panel) -->
+        <aside aria-label="Panel input parameter"
+            class="w-full md:w-[350px] lg:w-[400px] flex-shrink-0 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 flex flex-col md:h-[calc(100vh-60px)] md:sticky md:top-[60px] overflow-y-auto">
+            <!-- Tabs -->
+            <div class="flex p-2 gap-1 border-b border-slate-200 dark:border-slate-800 shrink-0">
+                <button onclick="setMode('standard')" id="tab-standard"
+                    class="flex-1 py-2 text-xs md:text-sm font-bold rounded-md bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 transition-colors">Standar
+                    (Ratio)</button>
+                <button onclick="setMode('manual')" id="tab-manual"
+                    class="flex-1 py-2 text-xs md:text-sm font-bold rounded-md bg-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Manual
+                    Input</button>
+            </div>
+
+            <!-- Scrollable Content -->
+            <div class="flex-grow p-4 space-y-6">
+
+                <!-- STANDAR MODE SECTION -->
+                <div id="section-standard" class="space-y-4 block">
+                    <div class="input-group">
+                        <label class="input-label text-blue-600 dark:text-blue-400" for="std-type">Standar
+                            Desain</label>
+                        <select id="std-type" class="custom-input" onchange="applyStandardRatios()">
+                            <option value="lapple">Lapple (1951) - General Purpose</option>
+                            <option value="stairmand_he">Stairmand (1951) - High Efficiency</option>
+                            <option value="stairmand_ht">Stairmand (1951) - High Throughput</option>
+                            <option value="swift_he">Swift (1969) - High Efficiency</option>
+                            <option value="swift_gp">Swift (1969) - General Purpose</option>
+                            <option value="swift_ht">Swift (1969) - High Throughput</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label text-blue-600 dark:text-blue-400" for="std-fixed-var">Variabel Utama
+                            (Yang Ingin Diatur)</label>
+                        <select id="std-fixed-var" class="custom-input" onchange="applyStandardRatios()">
+                            <option value="D">Diameter Siklon D (m)</option>
+                            <option value="a">Tinggi Inlet a (m)</option>
+                            <option value="b">Lebar Inlet b (m)</option>
+                            <option value="De">Diameter Outlet Gas De (m)</option>
+                            <option value="S">Panjang Pipa Outlet S (m)</option>
+                            <option value="h">Tinggi Total Silinder h (m)</option>
+                            <option value="H">Tinggi Total Siklon H (m)</option>
+                            <option value="B">Diameter Outlet Dust B (m)</option>
+                        </select>
+                        <p class="text-[11px] text-slate-600 dark:text-slate-300 mt-1">Variabel lain akan dihitung
+                            otomatis berdasarkan rasio standar yang dipilih.</p>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label text-emerald-600 dark:text-emerald-400" for="product-name">
+                        Nama Produk / Label
+                    </label>
+                    <input type="text" id="product-name" placeholder="Contoh: Pasir Kuarsa" class="custom-input"
+                        oninput="scheduleSaveAppState()">
+                </div>
+
+                <!-- GEOMETRY INPUTS -->
+                <div
+                    class="bg-slate-100 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <h3
+                        class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-2">
+                        <svg aria-hidden="true" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4">
+                            </path>
+                        </svg> Geometri (m)
+                    </h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="input-group"><label class="input-label" for="geom-D">Dia. Siklon (D)</label><input
+                                type="number" id="geom-D" value="1.0" step="0.1" class="custom-input"
+                                oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="geom-h">Tinggi Silinder
+                                (h)</label><input type="number" id="geom-h" value="2.0" step="0.1" class="custom-input"
+                                oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="geom-a">Tinggi Inlet (a)</label><input
+                                type="number" id="geom-a" value="0.5" step="0.05" class="custom-input"
+                                oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="geom-b">Lebar Inlet (b)</label><input
+                                type="number" id="geom-b" value="0.25" step="0.05" class="custom-input"
+                                oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="geom-De">Dia. Gas Out
+                                (De)</label><input type="number" id="geom-De" value="0.5" step="0.1"
+                                class="custom-input" oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="geom-S">Pipa Vortex (S)</label><input
+                                type="number" id="geom-S" value="0.625" step="0.05" class="custom-input"
+                                oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="geom-H">Tinggi Total (H)</label><input
+                                type="number" id="geom-H" value="4.0" step="0.1" class="custom-input"
+                                oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="geom-B">Dia. Dust Out (B)</label><input
+                                type="number" id="geom-B" value="0.25" step="0.05" class="custom-input"
+                                oninput="triggerRecalc()"></div>
+                    </div>
+                </div>
+
+                <!-- FISIKA & OPERASIONAL -->
+                <div class="space-y-3">
+                    <h3
+                        class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 pb-1">
+                        Kondisi Operasional</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="input-group"><label class="input-label" for="phys-Vi">Kec. Inlet (m/s)</label><input
+                                type="number" id="phys-Vi" value="25" step="0.5" class="custom-input"
+                                oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="phys-T">Suhu Gas (K)</label><input
+                                type="number" id="phys-T" value="298" step="1" class="custom-input"
+                                oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="phys-RhoP">Rho Partikel
+                                (kg/m³)</label><input type="number" id="phys-RhoP" value="2000" step="50"
+                                class="custom-input" oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="phys-Dp">Dia. Partikel
+                                (µm)</label><input type="number" id="phys-Dp" value="10" step="1"
+                                class="custom-input text-emerald-600 dark:text-emerald-400 font-bold"
+                                oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="phys-Mu">Viskositas Gas (µG ×
+                                10⁻⁵)</label><input type="number" id="phys-Mu" value="1.81" step="0.01"
+                                class="custom-input" oninput="triggerRecalc()"></div>
+                        <div class="input-group">
+                            <label class="input-label" for="phys-K">Konstanta Inlet (K)</label>
+                            <select id="phys-K" class="custom-input" onchange="triggerRecalc()">
+                                <option value="16">16 (S&L Default)</option>
+                                <option value="7.5">7.5 (Alternative)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="save-action-area">
+                    <button id="save-history-btn" onclick="saveNewToHistory()"
+                        class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition-colors shadow-md flex justify-center items-center gap-2">
+                        <svg aria-hidden="true" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4">
+                            </path>
+                        </svg>
+                        Simpan Perhitungan
+                    </button>
+                    <div id="save-loaded-actions" style="display:none" class="loaded-record-actions">
+                        <button onclick="updateLoadedRecord()" class="loaded-record-btn loaded-record-btn-update">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                </path>
+                            </svg>
+                            Update Record
+                        </button>
+                        <button onclick="saveNewToHistory()" class="loaded-record-btn loaded-record-btn-new">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            Simpan Baru
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- Main Content (3D & Results) -->
+        <main class="flex-grow flex flex-col p-4 md:p-6 min-w-0 gap-4">
+
+            <!-- Result Cards (Responsive Grid) -->
+            <div class="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 flex-shrink-0">
+                <div
+                    class="glass-panel p-3 md:p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 shadow-sm border-t-4 border-t-blue-500 flex flex-col justify-between">
+                    <div>
+                        <p class="text-[11px] md:text-xs font-bold text-slate-600 dark:text-slate-300 uppercase">Total
+                            Efficiency η</p>
+                        <h3 class="text-xl md:text-3xl font-black text-slate-800 dark:text-white mt-1" id="res-eff">0%
+                        </h3>
+                    </div>
+                    <div class="text-[11px] md:text-xs text-slate-600 dark:text-slate-300 mt-2 font-mono">Model: Leith &
+                        Licht</div>
+                </div>
+                <div
+                    class="glass-panel p-3 md:p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 shadow-sm border-t-4 border-t-yellow-500 flex flex-col justify-between">
+                    <div>
+                        <p class="text-[11px] md:text-xs font-bold text-slate-600 dark:text-slate-300 uppercase">Cut
+                            Point (d50)</p>
+                        <h3 class="text-xl md:text-3xl font-black text-slate-800 dark:text-white mt-1" id="res-d50">0 μm
+                        </h3>
+                    </div>
+                    <div class="text-[11px] md:text-xs text-slate-600 dark:text-slate-300 mt-2 font-mono">Model: Lapple
+                    </div>
+                </div>
+                <div
+                    class="glass-panel p-3 md:p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 shadow-sm border-t-4 border-t-orange-500 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2">
+                            <p class="text-[11px] md:text-xs font-bold text-slate-600 dark:text-slate-300 uppercase">
+                                Pressure Drop ΔP</p>
+                            <button onclick="togglePDUnit()" id="pd-unit-toggle"
+                                class="text-[10px] px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-md font-bold hover:bg-orange-200 dark:hover:bg-orange-900/50 transition-colors">
+                                Pa ⇄ mmH₂O
+                            </button>
+                        </div>
+                        <h3 class="text-xl md:text-3xl font-black text-slate-800 dark:text-white mt-1" id="res-dp">0 Pa
+                        </h3>
+                    </div>
+                    <div
+                        class="mt-2 text-[11px] md:text-xs text-slate-600 dark:text-slate-300 flex flex-col gap-0.5 w-full bg-slate-100 dark:bg-slate-800/50 p-1.5 rounded">
+                        <div class="flex justify-between"><span>Barth:</span> <span id="res-dp-barth"
+                                class="font-bold text-slate-700 dark:text-slate-300">0 Pa</span></div>
+                        <div class="flex justify-between"><span>Strmd:</span> <span id="res-dp-stairmand"
+                                class="font-bold text-slate-700 dark:text-slate-300">0 Pa</span></div>
+                    </div>
+                </div>
+                <div
+                    class="glass-panel p-3 md:p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 shadow-sm border-t-4 border-t-emerald-500 flex flex-col justify-between">
+                    <div>
+                        <p class="text-[11px] md:text-xs font-bold text-slate-600 dark:text-slate-300 uppercase">Inlet
+                            Velocity (Vi)</p>
+                        <h3 class="text-xl md:text-3xl font-black text-slate-800 dark:text-white mt-1" id="res-vi">0 m/s
+                        </h3>
+                    </div>
+                    <div class="text-[11px] md:text-xs text-slate-600 dark:text-slate-300 mt-2 font-mono">Kecepatan gas
+                        masuk</div>
+                </div>
+            </div>
+
+            <!-- Step-by-Step Collapsible -->
+            <div class="flex-shrink-0">
+                <button onclick="toggleCalcSteps()"
+                    class="w-full text-left px-4 py-3 rounded-xl border text-sm font-bold flex justify-between items-center transition-colors"
+                    style="background:var(--step-btn-bg);border-color:var(--step-btn-border);color:var(--step-btn-text)">
+                    <span class="flex items-center gap-2.5">
+                        <svg class="w-4 h-4 flex-shrink-0" style="color:var(--step-btn-icon)" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        Lihat Detail Perhitungan (Step-by-Step)
+                    </span>
+                    <span id="calc-steps-chevron" class="transition-transform duration-200 text-xs"
+                        style="color:var(--step-btn-icon)">▼</span>
+                </button>
+                <div id="calc-steps-panel"
+                    class="hidden mt-2 p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-mono overflow-x-auto max-h-[50vh] overflow-y-auto space-y-4">
+                </div>
+            </div>
+
+            <!-- 3D Container -->
+            <div class="canvas-wrapper">
+                <div id="three-container" role="img" aria-label="Visualisasi 3D cyclone separator"></div>
+
+                <!-- Controls Overlay -->
+                <div
+                    class="absolute bottom-2 md:bottom-4 left-2 right-2 md:left-4 md:right-4 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2 pointer-events-none">
+                    <div
+                        class="bg-black/50 backdrop-blur-md px-2 md:px-3 py-1.5 md:py-2 rounded-lg text-white/80 text-[11px] md:text-xs font-mono pointer-events-auto border border-white/10">
+                        Visualizing: <span id="lbl-active-std" class="font-bold text-blue-400">Lapple (1951)</span>
+                    </div>
+                    <div
+                        class="flex items-center gap-2 md:gap-3 bg-black/50 backdrop-blur-md px-3 md:px-4 py-1.5 md:py-2 rounded-xl border border-white/10 pointer-events-auto">
+                        <label for="input-FlowSpeed"
+                            class="text-white text-[11px] md:text-xs font-bold uppercase tracking-wider">Sim
+                            Speed</label>
+                        <input type="range" id="input-FlowSpeed" min="0.2" max="3" step="0.1" value="1.0"
+                            class="w-20 md:w-24 accent-emerald-500">
+                    </div>
+                </div>
+
+                <!-- Debug Sync Overlay -->
+                <div class="absolute top-2 left-2 md:top-4 md:left-4 z-10 flex flex-col gap-2 pointer-events-auto">
+                    <button id="debug-sync-toggle" onclick="toggleDebugSyncPanel()"
+                        class="px-2.5 py-1.5 bg-black/60 hover:bg-black/75 text-white text-[11px] md:text-xs rounded-lg border border-white/20 font-bold tracking-wide transition-colors">
+                        Debug Sync
+                    </button>
+                    <div id="debug-sync-panel"
+                        class="hidden bg-black/65 text-white/90 rounded-lg border border-white/20 px-2.5 py-2 font-mono text-[11px] md:text-xs min-w-[170px]">
+                        <div>Cyclone Y: <span id="debug-cyclone-y">-</span></div>
+                        <div>Particle Y: <span id="debug-particle-y">-</span></div>
+                        <div>Delta Y: <span id="debug-delta-y">-</span></div>
+                    </div>
+                </div>
+
+                <!-- Reset Camera Button -->
+                <button onclick="resetCamera()" aria-label="Reset posisi kamera"
+                    class="absolute top-2 right-2 md:top-4 md:right-4 p-2 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-lg text-slate-800 dark:text-white transition-all shadow-lg border border-slate-300 dark:border-slate-600 pointer-events-auto z-10">
+                    <svg aria-hidden="true" class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+                    </svg>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- History Modal -->
+    <div id="history-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="history-modal-title"
+        class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex justify-center items-center opacity-0 transition-opacity duration-300 p-4">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-5xl rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh] transform scale-95 transition-transform duration-300"
+            id="history-modal-content">
+            <div
+                class="px-4 md:px-6 py-3 md:py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                <h2 id="history-modal-title" class="text-base md:text-lg font-bold flex items-center gap-2">
+                    <svg aria-hidden="true" class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                    </svg>
+                    Calculation History
+                </h2>
+                <div class="history-toolbar">
+                    <button id="compare-btn" onclick="openComparisonView()" disabled
+                        class="history-btn history-btn-purple">
+                        <svg aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 17l-5-5m0 0l5-5m-5 5h18M16 7l5 5m0 0l-5 5m5-5H3"></path>
+                        </svg>
+                        Compare (<span id="compare-count">0</span>)
+                    </button>
+                    <button id="export-history-btn" onclick="exportHistoryExcel()"
+                        class="history-btn history-btn-emerald" disabled>
+                        <svg aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 7h16M4 12h16M4 17h16"></path>
+                        </svg>
+                        Export (<span id="export-count">0</span>)
+                    </button>
+                    <button onclick="document.getElementById('import-excel-input').click()"
+                        class="history-btn history-btn-sky">
+                        <svg aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
+                            </path>
+                        </svg>
+                        Import Excel
+                    </button>
+                    <input type="file" id="import-excel-input" accept=".xlsx,.xls,.csv"
+                        onchange="importHistoryExcel(event)" class="hidden">
+                    <button onclick="clearHistory()" class="history-btn history-btn-red">
+                        <svg aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                            </path>
+                        </svg>
+                        Clear All
+                    </button>
+                    <button onclick="toggleHistoryModal()" aria-label="Tutup modal riwayat"
+                        class="history-btn history-btn-neutral p-2"><svg aria-hidden="true" class="w-5 h-5" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg></button>
+                </div>
+            </div>
+            <div class="p-4 md:p-6 overflow-y-auto flex-grow bg-slate-50 dark:bg-slate-950">
+                <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <table class="w-full text-xs md:text-sm text-left whitespace-nowrap">
+                        <thead
+                            class="text-xs text-slate-700 uppercase bg-slate-100 dark:bg-slate-800 dark:text-slate-300">
+                            <tr>
+                                <th class="px-3 md:px-4 py-2 md:py-3">Produk</th>
+                                <th class="px-3 md:px-4 py-2 md:py-3">Mode</th>
+                                <th class="px-3 md:px-4 py-2 md:py-3">D (m)</th>
+                                <th class="px-3 md:px-4 py-2 md:py-3">Vi (m/s)</th>
+                                <th class="px-3 md:px-4 py-2 md:py-3">dp (μm)</th>
+                                <th
+                                    class="px-3 md:px-4 py-2 md:py-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400">
+                                    η (%)</th>
+                                <th
+                                    class="px-3 md:px-4 py-2 md:py-3 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400">
+                                    ΔP SL (Pa)</th>
+                                <th class="px-3 md:px-4 py-2 md:py-3 text-center w-10">
+                                    <div class="flex items-center justify-center gap-1.5">
+                                        <input id="history-select-all" type="checkbox"
+                                            onchange="toggleSelectAllHistory(this.checked)"
+                                            class="w-4 h-4 accent-purple-600 cursor-pointer" title="Pilih semua">
+                                        <span>Pilih</span>
+                                    </div>
+                                </th>
+                                <th class="px-3 md:px-4 py-2 md:py-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body" class="divide-y divide-slate-200 dark:divide-slate-800">
+                            <!-- Rows injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="history-empty" class="text-center py-10 text-slate-500 hidden">
+                    <p>Belum ada perhitungan yang disimpan.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comparison Modal -->
+    <div id="comparison-modal"
+        class="fixed inset-0 z-50 hidden flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+        <div
+            class="flex-shrink-0 px-4 py-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between">
+            <h2 class="text-base md:text-lg font-bold flex items-center gap-2">
+                🔀 Comparison Analysis
+            </h2>
+            <div class="flex items-center gap-2">
+                <select id="comp-pd-unit" onchange="updateComparisonDisplay(); updateComparisonChart();"
+                    class="custom-input py-1 px-2 text-xs w-auto">
+                    <option value="pa">Pa</option>
+                    <option value="mmh2o">mmH₂O</option>
+                </select>
+                <button onclick="closeComparisonView()"
+                    class="p-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="flex-grow overflow-y-auto p-4 md:p-6 space-y-6 max-w-6xl mx-auto w-full">
+            <div id="comp-product-headers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+
+            <div
+                class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-x-auto shadow-sm">
+                <table class="w-full text-xs md:text-sm whitespace-nowrap">
+                    <thead id="comp-table-head"
+                        class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 uppercase text-xs">
+                    </thead>
+                    <tbody id="comp-table-body" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody>
+                </table>
+            </div>
+
+            <div
+                class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-bold">Visualisasi Perbandingan</h3>
+                    <select id="comp-chart-metric" onchange="updateComparisonChart()"
+                        class="custom-input py-1 px-2 text-xs w-auto">
+                        <option value="eff">Efisiensi (%)</option>
+                        <option value="pd_sl">ΔP Shepherd &amp; Lapple</option>
+                        <option value="pd_barth">ΔP Barth</option>
+                        <option value="pd_stairmand">ΔP Stairmand</option>
+                    </select>
+                </div>
+                <div id="comp-bar-chart" class="flex items-end gap-4 h-48 md:h-64 px-4"></div>
+            </div>
+
+            <div
+                class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+                <button onclick="toggleComparison3D()" id="comp-3d-toggle"
+                    class="w-full px-4 py-3 text-sm font-bold text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                    <span class="flex items-center gap-2">
+                        🎮 Preview 3D Model
+                        <span
+                            class="text-[10px] px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-md font-bold">
+                            Opsional
+                        </span>
+                    </span>
+                    <span id="comp-3d-status" class="text-xs text-slate-500">OFF</span>
+                </button>
+                <div id="comp-3d-wrapper" class="hidden">
+                    <div
+                        class="flex flex-wrap items-center gap-2 px-3 py-2 border-t border-slate-200 dark:border-slate-800">
+                        <div class="flex items-center gap-1.5 overflow-x-auto flex-1 min-w-0" id="comp-3d-tabs"></div>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            <button onclick="toggleCompGridMode()" id="comp-grid-btn"
+                                class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-colors flex items-center gap-1"
+                                style="background:var(--step-btn-bg);border:1px solid var(--step-btn-border);color:var(--step-btn-text)">
+                                &#8862; Grid
+                            </button>
+                            <label
+                                class="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                                Speed
+                                <input type="range" id="comp-flow-speed" min="0.2" max="3" step="0.1" value="1.0"
+                                    class="w-14 md:w-20 accent-emerald-500">
+                            </label>
+                        </div>
+                    </div>
+                    <!-- Single product view (tab mode) -->
+                    <div id="comp-3d-container"
+                        class="w-full h-[300px] md:h-[400px] relative bg-gradient-to-b from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-950">
+                    </div>
+                    <!-- Grid view (all products side-by-side) -->
+                    <div id="comp-3d-grid" class="p-2 gap-2 bg-slate-100 dark:bg-slate-950" style="display:none">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="offline-banner"
+        class="hidden fixed inset-x-0 top-14 sm:top-auto sm:bottom-0 z-30 bg-amber-600 text-white text-sm font-semibold px-4 py-2 text-center shadow-lg">
+        ⚡ Mode Offline - Data tetap tersimpan lokal
+    </div>
+
+    <div id="update-banner"
+        class="hidden fixed top-16 right-4 z-50 bg-blue-600 text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-xl border border-blue-500/50">
+        <div class="flex items-center gap-3">
+            <span>🔄 Update tersedia</span>
+            <button onclick="applyUpdate()"
+                class="px-3 py-1 text-xs font-bold rounded-md bg-white text-blue-700 hover:bg-blue-100 transition-colors">Reload</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. STATE & RATIOS ---
+        let appMode = 'standard';
+        let calcHistory = [];
+        let deferredInstallPrompt = null;
+        let waitingServiceWorker = null;
+        const STORAGE_KEYS = { history: 'cycloneHistory', state: 'cycloneStateV1' };
+        const STORAGE_DB = { name: 'cycloneProStorage', version: 1, store: 'kv' };
+        let dbPromise = null;
+        let stateSaveTimer = null;
+        let pdDisplayUnit = 'pa';
+        let lastCalcResults = {};
+        let selectedCompareIndices = [];
+        let loadedRecordIdx = null;
+        let compScene = null;
+        let compCamera = null;
+        let compRenderer = null;
+        let compControls = null;
+        let compCycloneGroup = null;
+        let compParticleGroup = null;
+        let compParticlesHeavy = null;
+        let compParticlesLight = null;
+        let compHeavyData = [];
+        let compLightData = [];
+        let compParticleDims = null;
+        let comp3DActive = false;
+        let compGridMode = false;
+        let compGridCells = []; // [{scene,camera,renderer,controls,cycloneGroup,particleGroup,particlesH,particlesL,heavyData,lightData,dims,animId}]
+        let compActiveProductIdx = 0;
+        let compRecords = [];
+        let compAnimationFrameId = null;
+
+        const COMP_COLORS = [
+            { bgLight: '#eff6ff', bgDark: 'rgba(30,58,138,0.2)', borderColor: '#3b82f6', textLight: '#2563eb', textDark: '#60a5fa', barFrom: '#3b82f6', barTo: '#60a5fa' },
+            { bgLight: '#ecfdf5', bgDark: 'rgba(6,78,59,0.2)', borderColor: '#10b981', textLight: '#059669', textDark: '#34d399', barFrom: '#10b981', barTo: '#34d399' },
+            { bgLight: '#faf5ff', bgDark: 'rgba(88,28,135,0.2)', borderColor: '#a855f7', textLight: '#9333ea', textDark: '#c084fc', barFrom: '#a855f7', barTo: '#c084fc' },
+            { bgLight: '#fff7ed', bgDark: 'rgba(124,45,18,0.2)', borderColor: '#f97316', textLight: '#ea580c', textDark: '#fb923c', barFrom: '#f97316', barTo: '#fb923c' }
+        ];
+
+        const FORM_FIELD_IDS = [
+            'product-name',
+            'geom-D', 'geom-h', 'geom-a', 'geom-b', 'geom-De', 'geom-S', 'geom-H', 'geom-B',
+            'phys-Vi', 'phys-T', 'phys-RhoP', 'phys-Dp', 'phys-Mu', 'phys-K', 'std-fixed-var', 'input-FlowSpeed'
+        ];
+
+        const standardRatios = {
+            'lapple': { D: 1, a: 0.5, b: 0.25, De: 0.5, S: 0.625, h: 2.0, H: 4.0, B: 0.25 },
+            'stairmand_he': { D: 1, a: 0.5, b: 0.2, De: 0.5, S: 0.5, h: 1.5, H: 4.0, B: 0.375 },
+            'stairmand_ht': { D: 1, a: 0.75, b: 0.375, De: 0.75, S: 0.875, h: 1.5, H: 4.0, B: 0.375 },
+            'swift_he': { D: 1, a: 0.44, b: 0.21, De: 0.4, S: 0.5, h: 1.4, H: 3.9, B: 0.4 },
+            'swift_gp': { D: 1, a: 0.5, b: 0.25, De: 0.5, S: 0.6, h: 1.75, H: 3.75, B: 0.4 },
+            'swift_ht': { D: 1, a: 0.8, b: 0.35, De: 0.75, S: 0.85, h: 1.7, H: 3.7, B: 0.4 }
+        };
+
+        // PENCEGAHAN ERROR NaN PADA THREE.JS
+        // Mengamankan nilai input yang kosong atau bernilai minus agar tidak merusak geometri 3D
+        const getVal = (id) => {
+            const val = parseFloat(document.getElementById(id).value);
+            if (isNaN(val)) return 0.001;
+            if (id === 'geom-S') return Math.max(0, val);
+            return Math.max(0.001, val);
+        };
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function formatNumber(value, digits = 3) {
+            const num = Number(value);
+            if (!Number.isFinite(num)) return '-';
+            return num.toFixed(digits);
+        }
+
+        function formatPD(valuePa, targetUnit = pdDisplayUnit) {
+            const value = Number(valuePa);
+            if (!Number.isFinite(value)) {
+                return targetUnit === 'mmh2o' ? '0.0 mmH₂O' : '0 Pa';
+            }
+            if (targetUnit === 'mmh2o') {
+                return (value / 9.806).toFixed(1) + ' mmH₂O';
+            }
+            return Math.round(value).toLocaleString() + ' Pa';
+        }
+
+        function togglePDUnit() {
+            pdDisplayUnit = pdDisplayUnit === 'pa' ? 'mmh2o' : 'pa';
+            calculatePhysics();
+            scheduleSaveAppState();
+        }
+
+
+
+        function toggleCalcSteps() {
+            const panel = document.getElementById('calc-steps-panel');
+            const chevron = document.getElementById('calc-steps-chevron');
+            if (!panel || !chevron) return;
+            panel.classList.toggle('hidden');
+            chevron.style.transform = panel.classList.contains('hidden') ? '' : 'rotate(180deg)';
+        }
+
+        const readLocalStorageJSON = (key, fallbackValue) => {
+            try {
+                const raw = localStorage.getItem(key);
+                if (!raw) return { found: false, value: fallbackValue };
+                return { found: true, value: JSON.parse(raw) };
+            } catch (error) {
+                console.warn('Gagal membaca data lokal:', error);
+                return { found: false, value: fallbackValue };
+            }
+        };
+
+        const writeLocalStorageJSON = (key, value) => {
+            try {
+                localStorage.setItem(key, JSON.stringify(value));
+                return true;
+            } catch (error) {
+                console.warn('Gagal menyimpan data lokal:', error);
+                return false;
+            }
+        };
+
+        const removeLocalStorageKey = (key) => {
+            try {
+                localStorage.removeItem(key);
+                return true;
+            } catch (error) {
+                console.warn('Gagal menghapus data lokal:', error);
+                return false;
+            }
+        };
+
+        function openStorageDB() {
+            if (dbPromise) return dbPromise;
+            if (typeof window === 'undefined' || !('indexedDB' in window)) return Promise.resolve(null);
+
+            dbPromise = new Promise((resolve) => {
+                const request = window.indexedDB.open(STORAGE_DB.name, STORAGE_DB.version);
+
+                request.onupgradeneeded = () => {
+                    const db = request.result;
+                    if (!db.objectStoreNames.contains(STORAGE_DB.store)) {
+                        db.createObjectStore(STORAGE_DB.store);
+                    }
+                };
+
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => {
+                    console.warn('IndexedDB tidak tersedia, fallback ke localStorage.');
+                    resolve(null);
+                };
+            });
+
+            return dbPromise;
+        }
+
+        async function idbRead(key) {
+            const db = await openStorageDB();
+            if (!db) return { found: false, value: null };
+
+            return new Promise((resolve) => {
+                try {
+                    const tx = db.transaction(STORAGE_DB.store, 'readonly');
+                    const req = tx.objectStore(STORAGE_DB.store).get(key);
+                    req.onsuccess = () => resolve({ found: req.result !== undefined, value: req.result });
+                    req.onerror = () => resolve({ found: false, value: null });
+                } catch (_error) {
+                    resolve({ found: false, value: null });
+                }
+            });
+        }
+
+        async function idbWrite(key, value) {
+            const db = await openStorageDB();
+            if (!db) return false;
+
+            return new Promise((resolve) => {
+                try {
+                    const tx = db.transaction(STORAGE_DB.store, 'readwrite');
+                    tx.objectStore(STORAGE_DB.store).put(value, key);
+                    tx.oncomplete = () => resolve(true);
+                    tx.onerror = () => resolve(false);
+                } catch (_error) {
+                    resolve(false);
+                }
+            });
+        }
+
+        async function idbDelete(key) {
+            const db = await openStorageDB();
+            if (!db) return false;
+
+            return new Promise((resolve) => {
+                try {
+                    const tx = db.transaction(STORAGE_DB.store, 'readwrite');
+                    tx.objectStore(STORAGE_DB.store).delete(key);
+                    tx.oncomplete = () => resolve(true);
+                    tx.onerror = () => resolve(false);
+                } catch (_error) {
+                    resolve(false);
+                }
+            });
+        }
+
+        async function loadPersistedValue(key, fallbackValue) {
+            const fromIDB = await idbRead(key);
+            if (fromIDB.found) return fromIDB.value;
+
+            const legacy = readLocalStorageJSON(key, fallbackValue);
+            if (legacy.found) {
+                await idbWrite(key, legacy.value);
+                removeLocalStorageKey(key);
+                return legacy.value;
+            }
+
+            return fallbackValue;
+        }
+
+        async function savePersistedValue(key, value) {
+            const savedToIDB = await idbWrite(key, value);
+            if (savedToIDB) {
+                removeLocalStorageKey(key);
+                return true;
+            }
+            return writeLocalStorageJSON(key, value);
+        }
+
+        async function removePersistedValue(key) {
+            const removedFromIDB = await idbDelete(key);
+            removeLocalStorageKey(key);
+            return removedFromIDB;
+        }
+
+        function collectCurrentState() {
+            const formValues = {};
+            FORM_FIELD_IDS.forEach((id) => {
+                const element = document.getElementById(id);
+                if (element) formValues[id] = element.value;
+            });
+            return {
+                mode: appMode,
+                standardType: document.getElementById('std-type').value,
+                theme: isDarkMode() ? 'dark' : 'light',
+                pdDisplayUnit: pdDisplayUnit,
+                form: formValues,
+                updatedAt: Date.now()
+            };
+        }
+
+        function scheduleSaveAppState() {
+            if (suspendStatePersistence) return;
+            clearTimeout(stateSaveTimer);
+            stateSaveTimer = setTimeout(() => {
+                saveAppState();
+            }, 250);
+        }
+
+        async function saveAppState() {
+            await savePersistedValue(STORAGE_KEYS.state, collectCurrentState());
+        }
+
+        function applyStateObject(savedState) {
+            if (!savedState || typeof savedState !== 'object') return false;
+
+            if (savedState.theme === 'light') document.documentElement.classList.remove('dark');
+            if (savedState.theme === 'dark') document.documentElement.classList.add('dark');
+            if (savedState.pdDisplayUnit === 'mmh2o' || savedState.pdDisplayUnit === 'pa') {
+                pdDisplayUnit = savedState.pdDisplayUnit;
+            }
+
+            const stdTypeElement = document.getElementById('std-type');
+            if (savedState.standardType && Array.from(stdTypeElement.options).some((opt) => opt.value === savedState.standardType)) {
+                stdTypeElement.value = savedState.standardType;
+            }
+
+            if (savedState.form && typeof savedState.form === 'object') {
+                FORM_FIELD_IDS.forEach((id) => {
+                    const element = document.getElementById(id);
+                    const value = savedState.form[id];
+                    if (element && value !== undefined && value !== null) element.value = value;
+                });
+            }
+
+
+            updateHistoryUI();
+
+            setMode(savedState.mode === 'manual' ? 'manual' : 'standard');
+            return true;
+        }
+
+        async function applySavedState() {
+            const savedState = await loadPersistedValue(STORAGE_KEYS.state, null);
+            return applyStateObject(savedState);
+        }
+
+        // --- 2. UI LOGIC ---
+        function setMode(mode) {
+            appMode = mode;
+            const tabStd = document.getElementById('tab-standard');
+            const tabMan = document.getElementById('tab-manual');
+            const secStd = document.getElementById('section-standard');
+
+            if (mode === 'standard') {
+                tabStd.className = "flex-1 py-2 text-xs md:text-sm font-bold rounded-md bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 transition-colors";
+                tabMan.className = "flex-1 py-2 text-xs md:text-sm font-bold rounded-md bg-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors";
+                secStd.style.display = 'block';
+                applyStandardRatios();
+            } else {
+                tabMan.className = "flex-1 py-2 text-xs md:text-sm font-bold rounded-md bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 transition-colors";
+                tabStd.className = "flex-1 py-2 text-xs md:text-sm font-bold rounded-md bg-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors";
+                secStd.style.display = 'none';
+
+                const allVars = ['D', 'a', 'b', 'De', 'S', 'h', 'H', 'B'];
+                allVars.forEach((v) => {
+                    const inputEl = document.getElementById('geom-' + v);
+                    if (!inputEl) return;
+                    inputEl.disabled = false;
+                    inputEl.classList.remove('text-blue-600', 'dark:text-blue-400', 'font-bold');
+                });
+                document.getElementById('lbl-active-std').innerText = "Manual Geometry";
+                triggerRecalc();
+            }
+        }
+
+        function applyStandardRatios() {
+            if (appMode !== 'standard') return;
+            const stdKey = document.getElementById('std-type').value;
+            const fixedVarKey = document.getElementById('std-fixed-var').value;
+            const ratios = standardRatios[stdKey];
+            if (!ratios || !ratios[fixedVarKey]) return;
+
+            const fixedInput = document.getElementById('geom-' + fixedVarKey);
+            if (!fixedInput) return;
+            const fixedVal = Math.max(0.001, parseFloat(fixedInput.value) || 0.001);
+            const baseD = fixedVal / ratios[fixedVarKey];
+
+            const allVars = ['D', 'a', 'b', 'De', 'S', 'h', 'H', 'B'];
+            allVars.forEach((v) => {
+                const inputEl = document.getElementById('geom-' + v);
+                if (!inputEl) return;
+
+                if (v !== fixedVarKey) {
+                    inputEl.value = (baseD * ratios[v]).toFixed(3);
+                    inputEl.disabled = true;
+                    inputEl.classList.remove('text-blue-600', 'dark:text-blue-400', 'font-bold');
+                } else {
+                    inputEl.disabled = false;
+                    inputEl.classList.add('text-blue-600', 'dark:text-blue-400', 'font-bold');
+                }
+            });
+
+            const selectEl = document.getElementById('std-type');
+            document.getElementById('lbl-active-std').innerText = selectEl.options[selectEl.selectedIndex].text;
+
+            triggerRecalc(true);
+        }
+
+        function triggerRecalc(skipRatios = false) {
+            if (appMode === 'standard' && !skipRatios) {
+                const target = (typeof window !== 'undefined' && window.event && window.event.target) ? window.event.target : null;
+                const fixedVarKey = document.getElementById('std-fixed-var').value;
+                if (target && target.id === ('geom-' + fixedVarKey)) {
+                    applyStandardRatios();
+                    return;
+                }
+            }
+            calculatePhysics();
+            if (is3DReady) {
+                updateCycloneModel();
+                initParticles();
+            }
+            scheduleSaveAppState();
+        }
+
+        // --- 3. PHYSICS & MATH ---
+        function generateStepByStepHTML(vars) {
+            const n = (value, digits = 6) => formatNumber(value, digits);
+
+            return `
+                <details open>
+                    <summary class="font-bold text-blue-600 dark:text-blue-400 cursor-pointer mb-2">Efisiensi - Leith &amp; Licht</summary>
+                    <div class="space-y-2 ml-2 border-l-2 border-blue-200 dark:border-blue-800 pl-3">
+                        <div class="bg-slate-50 dark:bg-slate-800 p-2 rounded">
+                            <div class="text-slate-500 dark:text-slate-400">Step 1: Panjang vortex alami (l)</div>
+                            <code>l = 2.3 × De × (D²/(a×b))^(1/3)</code><br>
+                            <code>l = ${n(vars.l, 6)} m</code>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-800 p-2 rounded">
+                            <div class="text-slate-500 dark:text-slate-400">Step 2: Geometric factor (C)</div>
+                            <code>C = ${n(vars.C, 6)}</code>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-800 p-2 rounded">
+                            <div class="text-slate-500 dark:text-slate-400">Step 3: CP dan SP</div>
+                            <code>CP = ${n(vars.CP, 6)}</code><br>
+                            <code>SP = ${n(vars.SP, 6)}</code>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-800 p-2 rounded">
+                            <div class="text-slate-500 dark:text-slate-400">Step 4: Efisiensi total</div>
+                            <code>η = (1 - exp(-2 × CP × SP)) × 100%</code><br>
+                            <code class="text-emerald-600 dark:text-emerald-400 font-bold">η = ${n(vars.efficiency, 2)}%</code>
+                        </div>
+                    </div>
+                </details>
+                <details>
+                    <summary class="font-bold text-orange-600 dark:text-orange-400 cursor-pointer mb-2">Pressure Drop - Shepherd &amp; Lapple</summary>
+                    <div class="space-y-2 ml-2 border-l-2 border-orange-200 dark:border-orange-800 pl-3">
+                        <div class="bg-slate-50 dark:bg-slate-800 p-2 rounded">
+                            <div class="text-slate-500 dark:text-slate-400">Step 1: Dynamic pressure</div>
+                            <code>Pdyn = 0.5 × ρ × Vi² = ${n(vars.Pdyn, 3)} Pa</code>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-800 p-2 rounded">
+                            <div class="text-slate-500 dark:text-slate-400">Step 2: Head loss factor</div>
+                            <code>DH = K × (a×b) / De² = ${n(vars.DH_SL, 4)}</code>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-800 p-2 rounded">
+                            <div class="text-slate-500 dark:text-slate-400">Step 3: Pressure drop</div>
+                            <code class="text-orange-700 dark:text-orange-300 font-bold">${formatPD(vars.DP_SL)}</code>
+                        </div>
+                    </div>
+                </details>
+                <details>
+                    <summary class="font-bold text-purple-600 dark:text-purple-400 cursor-pointer mb-2">Pressure Drop - Barth</summary>
+                    <div class="space-y-2 ml-2 border-l-2 border-purple-200 dark:border-purple-800 pl-3">
+                        <div class="bg-slate-50 dark:bg-slate-800 p-2 rounded">
+                            <div class="text-slate-500 dark:text-slate-400">Step 1: α, λ, ratio</div>
+                            <code>α = ${n(vars.alpha, 6)}, λ = ${n(vars.lambda, 4)}</code><br>
+                            <code>ratio = ${n(vars.ratio_barth, 6)}</code>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-800 p-2 rounded">
+                            <div class="text-slate-500 dark:text-slate-400">Step 2: Head loss factor</div>
+                            <code>DH = ${n(vars.DH_Barth, 4)}</code>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-800 p-2 rounded">
+                            <div class="text-slate-500 dark:text-slate-400">Step 3: Pressure drop</div>
+                            <code class="text-purple-700 dark:text-purple-300 font-bold">${formatPD(vars.DP_Barth)}</code>
+                        </div>
+                    </div>
+                </details>
+                <details>
+                    <summary class="font-bold text-pink-600 dark:text-pink-400 cursor-pointer mb-2">Pressure Drop - Stairmand</summary>
+                    <div class="space-y-2 ml-2 border-l-2 border-pink-200 dark:border-pink-800 pl-3">
+                        <div class="bg-slate-50 dark:bg-slate-800 p-2 rounded">
+                            <div class="text-slate-500 dark:text-slate-400">Step 1: Area dan φ</div>
+                            <code>Area = ${n(vars.Area, 4)} m²</code><br>
+                            <code>φ = ${n(vars.phi, 6)}</code>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-800 p-2 rounded">
+                            <div class="text-slate-500 dark:text-slate-400">Step 2: Head loss factor</div>
+                            <code>DH = ${n(vars.DH_Stairmand, 4)}</code>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-800 p-2 rounded">
+                            <div class="text-slate-500 dark:text-slate-400">Step 3: Pressure drop</div>
+                            <code class="text-pink-700 dark:text-pink-300 font-bold">${formatPD(vars.DP_Stairmand)}</code>
+                        </div>
+                    </div>
+                </details>
+            `;
+        }
+
+        function calculatePhysics() {
+            const D = getVal('geom-D');
+            const a = getVal('geom-a');
+            const b = getVal('geom-b');
+            const De = getVal('geom-De');
+            const S = getVal('geom-S');
+            const h_cyl = getVal('geom-h');
+            const H = getVal('geom-H');
+            const B = getVal('geom-B');
+            const Vi = getVal('phys-Vi');
+            const T = getVal('phys-T');
+            const rho_p = getVal('phys-RhoP');
+            const dp_um = getVal('phys-Dp');
+            const mu_x10 = getVal('phys-Mu');
+            const K = getVal('phys-K');
+
+            const mu = mu_x10 * 1e-5;
+            const rho_air = 1.293 * (273 / Math.max(T, 1));
+            const dp = dp_um * 1e-6;
+            const n = 0.7;
+
+            const Q = Vi * a * b;
+
+            const Ne = (1 / Math.max(a, 0.0001)) * (h_cyl + Math.max(0.001, H - h_cyl) / 2);
+            const d50_m = Math.sqrt((9 * mu * b) / Math.max(0.0000001, (2 * Math.PI * Ne * Vi * Math.max(0.0001, (rho_p - rho_air)))));
+            const d50_um = d50_m * 1e6;
+
+            const l = 2.3 * De * Math.pow((D * D) / Math.max(0.0001, (a * b)), 1 / 3);
+            const d_cone = D - (D - B) * ((S + l - h_cyl) / Math.max(0.001, H - h_cyl));
+            const C = ((Math.PI * D * D) / Math.max(0.0001, (a * b))) * (
+                2 * (1 - Math.pow(De / D, 2)) * (S / D - a / (2 * D)) +
+                (1 / 3) * ((S + l - h_cyl) / D) * (1 + d_cone / D + Math.pow(d_cone / D, 2)) +
+                h_cyl / D - Math.pow(De / D, 2) * (l / D) - S / D
+            );
+
+            const CP = Math.pow(Math.max(0.0000001, (C * D * D / Math.max(0.0001, (a * b))) * (Q / Math.max(0.0001, Math.pow(D, 3))) * (n + 1)), 1 / (2 * n + 2));
+            const SP = Math.pow(Math.max(0.0000001, (rho_p * dp * dp) / Math.max(0.0000001, (18 * mu))), 1 / (2 * n + 2));
+            const efficiency = (1 - Math.exp(-2 * CP * SP)) * 100;
+
+            const Pdyn = 0.5 * rho_air * Vi * Vi;
+
+            const DH_SL = K * (a * b) / Math.max(0.0001, (De * De));
+            const DP_SL = DH_SL * Pdyn;
+
+            const alpha = 1 - 1.2 * (b / Math.max(0.0001, D));
+            const lambda = 0.02;
+            const ratio_barth = ((De / 2) * (Math.max(0.001, D - b)) * Math.PI) / ((2 * a * b * alpha) + ((H - S) * Math.max(0.001, D - b) * Math.PI * lambda));
+            const denominator_barth = Math.max(0.0001, 1 - ratio_barth * (H - S) * (2 / Math.max(De, 0.0001)) * lambda);
+            const epsilon_e = (De / D) * ((1 / Math.pow(denominator_barth, 2)) - 1);
+            const epsilon_i = (4.4 / Math.pow(Math.max(ratio_barth, 0.0001), 2 / 3)) + 1;
+            const DH_Barth = Math.pow(ratio_barth, 2) * Math.pow((4 * a * b) / Math.max(0.0001, (Math.PI * De * De)), 2) * (epsilon_e + epsilon_i);
+            const DP_Barth = DH_Barth * Pdyn;
+
+            const Area = (Math.PI / 4) * (D * D - De * De) +
+                Math.PI * D * h_cyl +
+                Math.PI * De * S +
+                (Math.PI / 2) * (D + B) * Math.sqrt((H - h_cyl) * (H - h_cyl) + ((D - B) / 2) * ((D - B) / 2));
+            const G_factor = 0.005;
+            const term1_stairmand = Math.sqrt(De / (2 * Math.max(0.001, D - b)));
+            const term2_stairmand = Math.sqrt((De / (2 * Math.max(0.001, D - b))) + (4 * G_factor * Area) / Math.max(0.0001, (a * b)));
+            const denominator_phi = Math.max(0.0001, (2 * G_factor * Area) / Math.max(0.0001, (a * b)));
+            const phi = (-term1_stairmand + term2_stairmand) / denominator_phi;
+            const DH_Stairmand = 1 + 2 * phi * phi * ((2 * Math.max(0.001, D - b) / Math.max(0.001, De)) - 1) + 2 * Math.pow((4 * a * b) / Math.max(0.0001, (Math.PI * De * De)), 2);
+            const DP_Stairmand = DH_Stairmand * Pdyn;
+
+            const viSafe = Number.isFinite(Vi) ? Vi : 0;
+            const d50Safe = Number.isFinite(d50_um) ? d50_um : 0;
+            const efficiencyRaw = Number.isFinite(efficiency) ? efficiency : 0;
+            const efficiencySafe = Math.max(0, Math.min(100, efficiencyRaw));
+            const dpSlSafe = Number.isFinite(DP_SL) ? DP_SL : 0;
+            const dpBarthSafe = Number.isFinite(DP_Barth) ? DP_Barth : 0;
+            const dpStairmandSafe = Number.isFinite(DP_Stairmand) ? DP_Stairmand : 0;
+
+            document.getElementById('res-vi').innerText = viSafe.toFixed(1) + " m/s";
+            document.getElementById('res-d50').innerText = d50Safe.toFixed(2) + " μm";
+            document.getElementById('res-eff').innerText = efficiencySafe.toFixed(1) + "%";
+            document.getElementById('res-dp').innerText = formatPD(dpSlSafe);
+
+            const barthEl = document.getElementById('res-dp-barth');
+            if (barthEl) barthEl.innerText = formatPD(dpBarthSafe);
+            const stairmandEl = document.getElementById('res-dp-stairmand');
+            if (stairmandEl) stairmandEl.innerText = formatPD(dpStairmandSafe);
+
+            lastCalcResults = {
+                DP_SL: dpSlSafe,
+                DP_Barth: dpBarthSafe,
+                DP_Stairmand: dpStairmandSafe,
+                efficiency: efficiencySafe,
+                efficiency_raw: efficiencyRaw,
+                d50_um: d50Safe,
+                Vi: viSafe
+            };
+
+            const stepsPanel = document.getElementById('calc-steps-panel');
+            if (stepsPanel) {
+                stepsPanel.innerHTML = generateStepByStepHTML({
+                    D, a, b, De, S, h_cyl, H, B, Vi: viSafe, Q, T, mu, rho_air, dp, dp_um,
+                    n, l, d_cone, C, CP, SP, efficiency: efficiencySafe,
+                    Pdyn, K, DH_SL, DP_SL: dpSlSafe,
+                    alpha, lambda, ratio_barth, denominator_barth, epsilon_e, epsilon_i, DH_Barth, DP_Barth: dpBarthSafe,
+                    Area, G_factor, phi, DH_Stairmand, DP_Stairmand: dpStairmandSafe,
+                    Ne, d50_um: d50Safe
+                });
+            }
+        }
+
+        // --- 4. HISTORY SYSTEM ---
+        async function loadHistory() {
+            const stored = await loadPersistedValue(STORAGE_KEYS.history, []);
+            calcHistory = Array.isArray(stored) ? stored : [];
+            selectedCompareIndices = [];
+            updateHistoryUI();
+        }
+
+        function buildCurrentRecord() {
+            const stdEl = document.getElementById('std-type');
+            const modeName = appMode === 'standard' ? stdEl.options[stdEl.selectedIndex].text : 'Manual Input';
+            const productName = (document.getElementById('product-name').value || '').trim() || 'Unnamed';
+            return {
+                id: Date.now(),
+                productName: productName,
+                timestamp: new Date().toISOString(),
+                mode: modeName,
+                D: getVal('geom-D'), a: getVal('geom-a'), b: getVal('geom-b'),
+                De: getVal('geom-De'), S: getVal('geom-S'), h: getVal('geom-h'), H: getVal('geom-H'), B: getVal('geom-B'),
+                Vi_input: getVal('phys-Vi'), dp: getVal('phys-Dp'), K: getVal('phys-K'),
+                eff: document.getElementById('res-eff').innerText,
+                dp_res: formatPD(lastCalcResults.DP_SL, 'pa'),
+                T: getVal('phys-T'),
+                mu: getVal('phys-Mu'),
+                rhoP: getVal('phys-RhoP'),
+                eff_raw: Number.isFinite(lastCalcResults.efficiency) ? lastCalcResults.efficiency : null,
+                dp_sl_raw: Number.isFinite(lastCalcResults.DP_SL) ? lastCalcResults.DP_SL : null,
+                dp_barth_raw: Number.isFinite(lastCalcResults.DP_Barth) ? lastCalcResults.DP_Barth : null,
+                dp_stairmand_raw: Number.isFinite(lastCalcResults.DP_Stairmand) ? lastCalcResults.DP_Stairmand : null,
+                d50_raw: Number.isFinite(lastCalcResults.d50_um) ? lastCalcResults.d50_um : null,
+                vi_raw: Number.isFinite(lastCalcResults.Vi) ? lastCalcResults.Vi : null
+            };
+        }
+
+        async function saveNewToHistory() {
+            const record = buildCurrentRecord();
+            calcHistory.unshift(record);
+            loadedRecordIdx = null;
+            updateSaveButtonState();
+
+            await savePersistedValue(STORAGE_KEYS.history, calcHistory);
+            updateHistoryUI();
+            flashSaveBtn('save-history-btn');
+        }
+
+        async function updateLoadedRecord() {
+            if (loadedRecordIdx === null || loadedRecordIdx < 0 || loadedRecordIdx >= calcHistory.length) return;
+            const record = buildCurrentRecord();
+            record.id = calcHistory[loadedRecordIdx].id;
+            record.timestamp = new Date().toISOString();
+            record.updatedAt = record.timestamp;
+            calcHistory[loadedRecordIdx] = record;
+            loadedRecordIdx = null;
+            updateSaveButtonState();
+
+            await savePersistedValue(STORAGE_KEYS.history, calcHistory);
+            updateHistoryUI();
+            flashSaveBtn('save-history-btn');
+        }
+
+        function flashSaveBtn(id) {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+            const og = btn.innerHTML;
+            btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> OK Disimpan!';
+            btn.classList.remove('bg-emerald-600');
+            btn.classList.add('bg-green-500');
+            setTimeout(() => { btn.innerHTML = og; btn.classList.remove('bg-green-500'); btn.classList.add('bg-emerald-600'); }, 1500);
+        }
+
+        function clearLoadedRecord() {
+            loadedRecordIdx = null;
+            updateSaveButtonState();
+        }
+
+        function updateSaveButtonState() {
+            const mainBtn = document.getElementById('save-history-btn');
+            const loadedActions = document.getElementById('save-loaded-actions');
+            if (!mainBtn || !loadedActions) return;
+
+            if (loadedRecordIdx !== null && loadedRecordIdx >= 0 && loadedRecordIdx < calcHistory.length) {
+                mainBtn.style.display = 'none';
+                loadedActions.style.display = 'flex';
+            } else {
+                mainBtn.style.display = '';
+                loadedActions.style.display = 'none';
+            }
+        }
+
+        function updateHistoryUI() {
+            document.querySelectorAll('[data-history-count]').forEach((node) => {
+                node.innerText = calcHistory.length;
+            });
+            selectedCompareIndices = selectedCompareIndices.filter((idx) => idx >= 0 && idx < calcHistory.length);
+            const tbody = document.getElementById('history-table-body');
+            const emptyState = document.getElementById('history-empty');
+
+            tbody.innerHTML = '';
+            if (calcHistory.length === 0) {
+                selectedCompareIndices = [];
+                emptyState.style.display = 'block';
+                updateCompareSelection();
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            calcHistory.forEach((rec, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = "bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors";
+                const checkedAttr = selectedCompareIndices.includes(idx) ? 'checked' : '';
+                tr.innerHTML = `
+                    <td class="px-3 md:px-4 py-2 md:py-3 font-semibold text-emerald-600 dark:text-emerald-400">${escapeHtml(rec.productName || 'Unnamed')}</td>
+                    <td class="px-3 md:px-4 py-2 md:py-3 font-medium text-slate-900 dark:text-white">${escapeHtml(rec.mode || '-')}</td>
+                    <td class="px-3 md:px-4 py-2 md:py-3">${escapeHtml(rec.D ?? '-')}</td>
+                    <td class="px-3 md:px-4 py-2 md:py-3">${escapeHtml(rec.Vi_input ?? rec.Q ?? '-')}</td>
+                    <td class="px-3 md:px-4 py-2 md:py-3">${escapeHtml(rec.dp ?? '-')}</td>
+                    <td class="px-3 md:px-4 py-2 md:py-3 font-bold text-blue-600 dark:text-blue-400">${escapeHtml(rec.eff || '-')}</td>
+                    <td class="px-3 md:px-4 py-2 md:py-3 font-bold text-orange-600 dark:text-orange-400">${escapeHtml(rec.dp_res || '-')}</td>
+                    <td class="px-3 md:px-4 py-2 md:py-3 text-center">
+                        <input type="checkbox" data-compare-idx="${idx}" onchange="updateCompareSelection()" class="w-4 h-4 accent-purple-600 cursor-pointer" ${checkedAttr}>
+                    </td>
+                    <td class="px-3 md:px-4 py-2 md:py-3 text-center">
+                        <div class="history-row-actions">
+                            <button onclick="loadRecord(${idx})" class="history-row-btn history-row-btn-load" title="Load data ke form">
+                                <svg aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                <span>Load</span>
+                            </button>
+                            <button onclick="deleteHistoryItem(${idx})" class="history-row-btn history-row-btn-delete" title="Hapus data ini">
+                                <svg aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                <span>Delete</span>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            updateCompareSelection();
+        }
+
+        async function clearHistory() {
+            if (confirm("Hapus semua riwayat perhitungan?")) {
+                calcHistory = [];
+                selectedCompareIndices = [];
+                loadedRecordIdx = null;
+                updateSaveButtonState();
+                compRecords = [];
+                closeComparisonView();
+                await removePersistedValue(STORAGE_KEYS.history);
+                updateHistoryUI();
+                await saveAppState();
+
+            }
+        }
+
+        async function deleteHistoryItem(idx) {
+            if (idx < 0 || idx >= calcHistory.length) return;
+            const name = calcHistory[idx].productName || 'Unnamed';
+            if (!confirm(`Hapus riwayat "${name}" (#${idx + 1})?`)) return;
+            calcHistory.splice(idx, 1);
+            // Adjust selected compare indices
+            selectedCompareIndices = selectedCompareIndices
+                .filter(i => i !== idx)
+                .map(i => i > idx ? i - 1 : i);
+            // Adjust loaded record tracking
+            if (loadedRecordIdx !== null) {
+                if (loadedRecordIdx === idx) { loadedRecordIdx = null; updateSaveButtonState(); }
+                else if (loadedRecordIdx > idx) { loadedRecordIdx--; }
+            }
+            updateHistoryUI();
+            await savePersistedValue(STORAGE_KEYS.history, calcHistory);
+
+        }
+
+        function exportHistoryExcel() {
+            if (typeof XLSX === 'undefined') {
+                alert('Library XLSX belum dimuat. Coba refresh halaman dan ulangi.');
+                return;
+            }
+            if (!calcHistory || calcHistory.length === 0) {
+                alert('Tidak ada data history untuk diekspor.');
+                return;
+            }
+
+            if (selectedCompareIndices.length < 1) {
+                alert('Pilih minimal 1 data history untuk export.');
+                return;
+            }
+
+            const sourceRecords = selectedCompareIndices
+                .filter(i => i >= 0 && i < calcHistory.length)
+                .sort((a, b) => a - b)
+                .map(i => calcHistory[i]);
+            if (sourceRecords.length === 0) {
+                alert('Data yang dipilih tidak valid.');
+                return;
+            }
+
+            const rows = sourceRecords.map((rec, idx) => ({
+                'No': idx + 1,
+                'Produk': rec.productName || '',
+                'Mode': rec.mode || '',
+                'D (m)': rec.D ?? '',
+                'a (m)': rec.a ?? '',
+                'b (m)': rec.b ?? '',
+                'De (m)': rec.De ?? '',
+                'S (m)': rec.S ?? '',
+                'h (m)': rec.h ?? '',
+                'H (m)': rec.H ?? '',
+                'B (m)': rec.B ?? '',
+                'Vi inlet (m/s)': rec.Vi_input ?? rec.Q ?? '',
+                'T (K)': rec.T ?? '',
+                'ρp (kg/m³)': rec.rhoP ?? '',
+                'dp (μm)': rec.dp ?? '',
+                'μ (Pa·s)': rec.mu ?? '',
+                'K': rec.K ?? '',
+                'Vi (m/s)': rec.vi_raw ?? '',
+                'd50 (μm)': rec.d50_raw ?? '',
+                'η (%)': rec.eff_raw ?? (parseFloat(String(rec.eff || '').replace(/[^0-9.-]/g, '')) || ''),
+                'ΔP S&L (Pa)': rec.dp_sl_raw ?? '',
+                'ΔP Barth (Pa)': rec.dp_barth_raw ?? '',
+                'ΔP Stairmand (Pa)': rec.dp_stairmand_raw ?? '',
+                'Timestamp': rec.timestamp || ''
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(rows);
+            // Auto-size columns
+            const colWidths = Object.keys(rows[0] || {}).map(key => ({
+                wch: Math.max(key.length + 2, ...rows.map(r => String(r[key] || '').length + 1))
+            }));
+            ws['!cols'] = colWidths;
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Data History');
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            XLSX.writeFile(wb, `cyclone-history-${timestamp}.xlsx`);
+        }
+
+        function toggleSelectAllHistory(checked) {
+            const checkboxes = document.querySelectorAll('[data-compare-idx]');
+            checkboxes.forEach((checkbox) => {
+                checkbox.checked = !!checked;
+            });
+            updateCompareSelection();
+        }
+
+        async function importHistoryExcel(event) {
+            const input = event.target;
+            const file = input && input.files ? input.files[0] : null;
+            if (!file) return;
+
+            if (typeof XLSX === 'undefined') {
+                alert('Library XLSX belum dimuat. Coba refresh halaman dan ulangi.');
+                if (input) input.value = '';
+                return;
+            }
+
+            try {
+                const data = await file.arrayBuffer();
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheetName = workbook.SheetNames[0];
+                if (!sheetName) throw new Error('File Excel kosong.');
+                const jsonRows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+                if (!jsonRows || jsonRows.length === 0) throw new Error('Tidak ada data di file.');
+
+                // Map columns to record fields
+                const colMap = {
+                    'Produk': 'productName', 'Mode': 'mode',
+                    'D (m)': 'D', 'a (m)': 'a', 'b (m)': 'b', 'De (m)': 'De',
+                    'S (m)': 'S', 'h (m)': 'h', 'H (m)': 'H', 'B (m)': 'B',
+                    'Vi inlet (m/s)': 'Vi_input', 'T (K)': 'T', 'ρp (kg/m³)': 'rhoP',
+                    'dp (μm)': 'dp', 'μ (Pa·s)': 'mu', 'K': 'K',
+                    'Vi (m/s)': 'vi_raw', 'd50 (μm)': 'd50_raw',
+                    'η (%)': 'eff_raw', 'ΔP S&L (Pa)': 'dp_sl_raw',
+                    'ΔP Barth (Pa)': 'dp_barth_raw', 'ΔP Stairmand (Pa)': 'dp_stairmand_raw',
+                    'Timestamp': 'timestamp'
+                };
+                const numericFields = new Set(['D', 'a', 'b', 'De', 'S', 'h', 'H', 'B', 'Vi_input', 'T', 'rhoP', 'dp', 'mu', 'K', 'vi_raw', 'd50_raw', 'eff_raw', 'dp_sl_raw', 'dp_barth_raw', 'dp_stairmand_raw']);
+
+                const imported = jsonRows.map(row => {
+                    const rec = {};
+                    for (const [col, field] of Object.entries(colMap)) {
+                        if (row[col] !== undefined && row[col] !== '') {
+                            rec[field] = numericFields.has(field) ? Number(row[col]) : String(row[col]);
+                        }
+                    }
+                    // Generate readable eff string from eff_raw
+                    if (rec.eff_raw !== undefined && Number.isFinite(rec.eff_raw)) {
+                        rec.eff = rec.eff_raw.toFixed(1) + '%';
+                    }
+                    // Generate dp_res from dp_sl_raw
+                    if (rec.dp_sl_raw !== undefined && Number.isFinite(rec.dp_sl_raw)) {
+                        rec.dp_res = rec.dp_sl_raw.toFixed(0) + ' Pa';
+                    }
+                    if (!rec.timestamp) rec.timestamp = new Date().toISOString();
+                    return rec;
+                });
+
+                const mode = confirm(`Ditemukan ${imported.length} data.\n\nOK = Tambahkan ke history yang ada\nCancel = Ganti semua history`)
+                    ? 'append' : 'replace';
+
+                if (mode === 'replace') {
+                    calcHistory = imported;
+                } else {
+                    calcHistory = calcHistory.concat(imported);
+                }
+
+
+                selectedCompareIndices = [];
+                updateHistoryUI();
+                await savePersistedValue(STORAGE_KEYS.history, calcHistory);
+                alert(`Import berhasil! ${imported.length} data diimport.`);
+            } catch (error) {
+                console.warn('Import Excel gagal:', error);
+                alert('Import gagal: ' + (error.message || 'File tidak valid.'));
+            } finally {
+                if (input) input.value = '';
+            }
+        }
+
+        function loadRecord(idx) {
+            const rec = calcHistory[idx];
+            if (!rec) return;
+            const productInput = document.getElementById('product-name');
+            if (productInput) productInput.value = rec.productName || '';
+
+            // Restore correct mode based on saved record
+            const stdSelect = document.getElementById('std-type');
+            let matchedStandard = false;
+            if (rec.mode && rec.mode !== 'Manual Input' && stdSelect) {
+                // Try to match the saved mode text to one of the standard options
+                for (let i = 0; i < stdSelect.options.length; i++) {
+                    if (stdSelect.options[i].text === rec.mode) {
+                        stdSelect.selectedIndex = i;
+                        matchedStandard = true;
+                        break;
+                    }
+                }
+            }
+
+            document.getElementById('geom-D').value = rec.D;
+            document.getElementById('geom-a').value = rec.a;
+            document.getElementById('geom-b').value = rec.b;
+            document.getElementById('geom-De').value = rec.De;
+            document.getElementById('geom-S').value = rec.S !== undefined ? rec.S : document.getElementById('geom-S').value;
+            document.getElementById('geom-h').value = rec.h;
+            document.getElementById('geom-H').value = rec.H;
+            document.getElementById('geom-B').value = rec.B !== undefined ? rec.B : document.getElementById('geom-B').value;
+            document.getElementById('phys-Vi').value = rec.Vi_input ?? rec.Q ?? 25;
+            document.getElementById('phys-Dp').value = rec.dp;
+            if (rec.K !== undefined) document.getElementById('phys-K').value = rec.K;
+            if (rec.T !== undefined) document.getElementById('phys-T').value = rec.T;
+            if (rec.mu !== undefined) document.getElementById('phys-Mu').value = rec.mu;
+            if (rec.rhoP !== undefined) document.getElementById('phys-RhoP').value = rec.rhoP;
+
+            // Set mode AFTER filling values — standard mode's applyStandardRatios may
+            // override geometry, so we re-apply saved values afterward
+            if (matchedStandard) {
+                setMode('standard');
+                // Re-apply the saved geometry since applyStandardRatios may have overwritten some
+                document.getElementById('geom-D').value = rec.D;
+                document.getElementById('geom-a').value = rec.a;
+                document.getElementById('geom-b').value = rec.b;
+                document.getElementById('geom-De').value = rec.De;
+                if (rec.S !== undefined) document.getElementById('geom-S').value = rec.S;
+                document.getElementById('geom-h').value = rec.h;
+                document.getElementById('geom-H').value = rec.H;
+                if (rec.B !== undefined) document.getElementById('geom-B').value = rec.B;
+            } else {
+                setMode('manual');
+            }
+
+            loadedRecordIdx = idx;
+            updateSaveButtonState();
+            triggerRecalc();
+            toggleHistoryModal();
+        }
+
+        function parseLegacyPressureDropPa(textValue) {
+            const cleaned = String(textValue || '')
+                .replace(/,/g, '')
+                .replace(/[^0-9.-]/g, '');
+            const value = Number(cleaned);
+            return Number.isFinite(value) ? value : NaN;
+        }
+
+        function getRecordPressureDropPa(rec, key) {
+            const raw = Number(rec ? rec[key] : NaN);
+            if (Number.isFinite(raw)) return raw;
+            if (key === 'dp_sl_raw') return parseLegacyPressureDropPa(rec ? rec.dp_res : '');
+            return NaN;
+        }
+
+        function updateCompareSelection() {
+            const checkboxes = document.querySelectorAll('[data-compare-idx]');
+            selectedCompareIndices = [];
+            checkboxes.forEach((checkbox) => {
+                if (!checkbox.checked) return;
+                const idx = parseInt(checkbox.dataset.compareIdx || '', 10);
+                if (Number.isInteger(idx)) selectedCompareIndices.push(idx);
+            });
+
+            const btn = document.getElementById('compare-btn');
+            const exportBtn = document.getElementById('export-history-btn');
+            const count = document.getElementById('compare-count');
+            const selectAll = document.getElementById('history-select-all');
+            const selectedCount = selectedCompareIndices.length;
+            const totalCount = checkboxes.length;
+            if (btn) btn.disabled = selectedCompareIndices.length < 2;
+            if (exportBtn) exportBtn.disabled = selectedCount < 1;
+            if (count) count.textContent = String(selectedCompareIndices.length);
+            const exportCount = document.getElementById('export-count');
+            if (exportCount) exportCount.textContent = String(selectedCount);
+            if (selectAll) {
+                selectAll.disabled = totalCount === 0;
+                selectAll.checked = totalCount > 0 && selectedCount === totalCount;
+                selectAll.indeterminate = selectedCount > 0 && selectedCount < totalCount;
+            }
+        }
+
+        function openComparisonView() {
+            compRecords = selectedCompareIndices.map((idx) => calcHistory[idx]).filter(Boolean);
+            if (compRecords.length < 2) return;
+
+            compActiveProductIdx = 0;
+            const unitSelect = document.getElementById('comp-pd-unit');
+            if (unitSelect) unitSelect.value = pdDisplayUnit;
+
+            const modal = document.getElementById('comparison-modal');
+            if (modal) modal.classList.remove('hidden');
+
+            const historyModal = document.getElementById('history-modal');
+            if (historyModal && !historyModal.classList.contains('hidden')) toggleHistoryModal();
+
+            updateComparisonDisplay();
+            updateComparisonChart();
+        }
+
+        function closeComparisonView() {
+            const modal = document.getElementById('comparison-modal');
+            if (modal) modal.classList.add('hidden');
+            disposeComparison3D();
+        }
+
+        function updateComparisonDisplay() {
+            if (!compRecords || compRecords.length < 2) return;
+
+            const unit = (document.getElementById('comp-pd-unit') || {}).value || 'pa';
+            const unitLabel = unit === 'mmh2o' ? 'mmH₂O' : 'Pa';
+            const convertPD = (pa) => unit === 'mmh2o' ? (pa / 9.806).toFixed(1) : Math.round(pa).toLocaleString();
+            const asFixed = (value, digits = 2) => {
+                const num = Number(value);
+                return Number.isFinite(num) ? num.toFixed(digits) : '-';
+            };
+
+            const headersDiv = document.getElementById('comp-product-headers');
+            const dark = isDarkMode();
+            if (headersDiv) {
+                headersDiv.innerHTML = compRecords.map((rec, idx) => {
+                    const c = COMP_COLORS[idx % COMP_COLORS.length];
+                    const bg = dark ? c.bgDark : c.bgLight;
+                    const txt = dark ? c.textDark : c.textLight;
+                    return `<div class="p-3 rounded-xl" style="border-left:4px solid ${c.borderColor};background:${bg}">
+                        <div class="text-xs text-slate-500">#${idx + 1}</div>
+                        <div class="font-bold" style="color:${txt}">${escapeHtml(rec.productName || 'Unnamed')}</div>
+                        <div class="text-[11px] text-slate-500">${escapeHtml(rec.mode || '-')} · D=${asFixed(rec.D, 3)}m</div>
+                    </div>`;
+                }).join('');
+            }
+
+            const thead = document.getElementById('comp-table-head');
+            const tbody = document.getElementById('comp-table-body');
+            if (!thead || !tbody) return;
+
+            thead.innerHTML = `<tr>
+                <th class="px-3 py-2 text-left">Parameter</th>
+                ${compRecords.map((rec, idx) => { const c = COMP_COLORS[idx % COMP_COLORS.length]; const txt = dark ? c.textDark : c.textLight; return `<th class="px-3 py-2" style="color:${txt}">#${idx + 1} ${escapeHtml(rec.productName || 'Unnamed')}</th>`; }).join('')}
+            </tr>`;
+
+            const rows = [
+                ['Mode', (rec) => escapeHtml(rec.mode || '-')],
+                // -- Geometry --
+                ['D (m)', (rec) => asFixed(rec.D, 3)],
+                ['a (m)', (rec) => asFixed(rec.a, 3)],
+                ['b (m)', (rec) => asFixed(rec.b, 3)],
+                ['De (m)', (rec) => asFixed(rec.De, 3)],
+                ['S (m)', (rec) => asFixed(rec.S, 3)],
+                ['h (m)', (rec) => asFixed(rec.h, 3)],
+                ['H (m)', (rec) => asFixed(rec.H, 3)],
+                ['B (m)', (rec) => asFixed(rec.B, 3)],
+                // -- Kondisi Operasional --
+                ['Vi (m/s)', (rec) => asFixed(rec.Vi_input ?? rec.Q, 2)],
+                ['T (K)', (rec) => asFixed(rec.T, 1)],
+                ['ρp (kg/m³)', (rec) => asFixed(rec.rhoP, 0)],
+                ['dp (μm)', (rec) => asFixed(rec.dp, 2)],
+                ['μ (×10⁻⁵)', (rec) => asFixed(rec.mu, 2)],
+                ['K', (rec) => asFixed(rec.K, 1)],
+                // -- Hasil --
+                ['Vi (m/s)', (rec) => asFixed(rec.vi_raw, 1)],
+                ['d50 (μm)', (rec) => asFixed(rec.d50_raw, 2)],
+                ['η (%)', (rec) => {
+                    const raw = Number(rec.eff_raw);
+                    if (Number.isFinite(raw)) return raw.toFixed(1);
+                    const legacy = parseFloat(String(rec.eff || '').replace(/[^0-9.-]/g, ''));
+                    return Number.isFinite(legacy) ? legacy.toFixed(1) : '-';
+                }],
+                [`ΔP S&L (${unitLabel})`, (rec) => {
+                    const pa = getRecordPressureDropPa(rec, 'dp_sl_raw');
+                    return Number.isFinite(pa) ? convertPD(pa) : '-';
+                }],
+                [`ΔP Barth (${unitLabel})`, (rec) => {
+                    const pa = getRecordPressureDropPa(rec, 'dp_barth_raw');
+                    return Number.isFinite(pa) ? convertPD(pa) : '-';
+                }],
+                [`ΔP Stairmand (${unitLabel})`, (rec) => {
+                    const pa = getRecordPressureDropPa(rec, 'dp_stairmand_raw');
+                    return Number.isFinite(pa) ? convertPD(pa) : '-';
+                }]
+            ];
+
+            tbody.innerHTML = rows.map(([label, getter]) => `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800">
+                <td class="px-3 py-2 font-semibold">${label}</td>
+                ${compRecords.map((rec) => `<td class="px-3 py-2 font-mono">${getter(rec)}</td>`).join('')}
+            </tr>`).join('');
+        }
+
+        function updateComparisonChart() {
+            const chart = document.getElementById('comp-bar-chart');
+            if (!chart) return;
+            if (!compRecords || compRecords.length === 0) {
+                chart.innerHTML = '';
+                return;
+            }
+
+            const metric = (document.getElementById('comp-chart-metric') || {}).value || 'eff';
+            const unit = (document.getElementById('comp-pd-unit') || {}).value || 'pa';
+
+            const getValue = (rec) => {
+                if (metric === 'eff') {
+                    const raw = Number(rec.eff_raw);
+                    if (Number.isFinite(raw)) return Math.max(0, raw);
+                    const legacy = parseFloat(String(rec.eff || '').replace(/[^0-9.-]/g, ''));
+                    return Number.isFinite(legacy) ? Math.max(0, legacy) : 0;
+                }
+                if (metric === 'pd_sl') {
+                    const pa = getRecordPressureDropPa(rec, 'dp_sl_raw');
+                    if (!Number.isFinite(pa)) return 0;
+                    return unit === 'mmh2o' ? Math.max(0, pa / 9.806) : Math.max(0, pa);
+                }
+                if (metric === 'pd_barth') {
+                    const pa = getRecordPressureDropPa(rec, 'dp_barth_raw');
+                    if (!Number.isFinite(pa)) return 0;
+                    return unit === 'mmh2o' ? Math.max(0, pa / 9.806) : Math.max(0, pa);
+                }
+                if (metric === 'pd_stairmand') {
+                    const pa = getRecordPressureDropPa(rec, 'dp_stairmand_raw');
+                    if (!Number.isFinite(pa)) return 0;
+                    return unit === 'mmh2o' ? Math.max(0, pa / 9.806) : Math.max(0, pa);
+                }
+                return 0;
+            };
+
+            const values = compRecords.map(getValue);
+            const maxVal = Math.max(...values, 0);
+            const maxScale = maxVal > 0 ? maxVal * 1.15 : 1;
+            const unitLabel = metric === 'eff' ? '%' : (unit === 'mmh2o' ? 'mmH₂O' : 'Pa');
+
+            const chartDark = isDarkMode();
+            chart.innerHTML = compRecords.map((rec, idx) => {
+                const val = values[idx] || 0;
+                const heightPct = Math.max(2, (val / maxScale) * 100);
+                const c = COMP_COLORS[idx % COMP_COLORS.length];
+                const txt = chartDark ? c.textDark : c.textLight;
+                return `<div class="flex-1 flex flex-col items-center min-w-0" style="height:100%">
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;width:100%">
+                        <div class="text-xs font-bold mb-1" style="color:${txt}">${val.toFixed(1)} ${unitLabel}</div>
+                        <div class="w-full rounded-t" style="height:${heightPct}%;background:linear-gradient(to top,${c.barFrom},${c.barTo})"></div>
+                    </div>
+                    <div class="text-[10px] font-semibold mt-2 text-center truncate w-full" style="flex-shrink:0">${escapeHtml(rec.productName || ('#' + (idx + 1)))}</div>
+                </div>`;
+            }).join('');
+        }
+
+        function disposeThreeObject(node) {
+            if (!node) return;
+            if (node.geometry && node.geometry.dispose) node.geometry.dispose();
+            if (node.material) {
+                if (Array.isArray(node.material)) {
+                    node.material.forEach((material) => material && material.dispose && material.dispose());
+                } else if (node.material.dispose) {
+                    node.material.dispose();
+                }
+            }
+            if (node.children && node.children.length) {
+                node.children.forEach((child) => disposeThreeObject(child));
+            }
+        }
+
+        function clearThreeGroup(group) {
+            if (!group) return;
+            while (group.children.length > 0) {
+                const child = group.children[0];
+                group.remove(child);
+                disposeThreeObject(child);
+            }
+        }
+
+        async function toggleComparison3D() {
+            const wrapper = document.getElementById('comp-3d-wrapper');
+            const status = document.getElementById('comp-3d-status');
+            if (!wrapper || !status || !compRecords || compRecords.length === 0) return;
+
+            comp3DActive = !comp3DActive;
+            if (comp3DActive) {
+                wrapper.classList.remove('hidden');
+                status.textContent = 'ON';
+                // Wait for the DOM to lay out the container so it has real dimensions
+                await new Promise(resolve => {
+                    requestAnimationFrame(() => requestAnimationFrame(resolve));
+                });
+                try {
+                    await initComparison3D();
+                    // Ensure renderer matches the now-visible container size
+                    onComparisonResize();
+                    renderComp3DTabs();
+                    renderCompCyclone(compRecords[compActiveProductIdx] || compRecords[0]);
+                } catch (error) {
+                    console.warn('Gagal menyiapkan comparison 3D:', error);
+                    comp3DActive = false;
+                    wrapper.classList.add('hidden');
+                    status.textContent = 'OFF';
+                    disposeComparison3D();
+                }
+            } else {
+                wrapper.classList.add('hidden');
+                status.textContent = 'OFF';
+                disposeComparison3D();
+            }
+        }
+
+        async function initComparison3D() {
+            if (compScene && compRenderer) {
+                onComparisonResize();
+                return;
+            }
+
+            await ensureThreeLibrariesLoaded();
+            const container = document.getElementById('comp-3d-container');
+            if (!container) throw new Error('Container comparison 3D tidak ditemukan.');
+
+            compScene = new THREE.Scene();
+            compCamera = new THREE.PerspectiveCamera(45, container.clientWidth / Math.max(1, container.clientHeight), 0.1, 1000);
+            compCamera.position.set(6, 2, 8);
+
+            compRenderer = new THREE.WebGLRenderer({ antialias: ensurePerformanceProfile().antialias, alpha: true });
+            compRenderer.setSize(container.clientWidth, container.clientHeight);
+            compRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, ensurePerformanceProfile().pixelRatioCap));
+            container.appendChild(compRenderer.domElement);
+
+            compControls = new THREE.OrbitControls(compCamera, compRenderer.domElement);
+            compControls.enableDamping = true;
+            compControls.target.set(0, 0, 0);
+
+            compScene.add(new THREE.AmbientLight(0xffffff, 0.8));
+            const dir = new THREE.DirectionalLight(0xffffff, 1);
+            dir.position.set(10, 20, 10);
+            compScene.add(dir);
+            const back = new THREE.DirectionalLight(0x60a5fa, 0.8);
+            back.position.set(-10, 10, -10);
+            compScene.add(back);
+
+            compCycloneGroup = new THREE.Group();
+            compScene.add(compCycloneGroup);
+
+            compParticleGroup = new THREE.Group();
+            compScene.add(compParticleGroup);
+
+            window.addEventListener('resize', onComparisonResize);
+            onComparisonResize();
+
+            const compAnimate = () => {
+                if (!comp3DActive || !compRenderer || !compScene || !compCamera) return;
+                compAnimationFrameId = requestAnimationFrame(compAnimate);
+                if (compControls) compControls.update();
+                updateCompParticles();
+                compRenderer.render(compScene, compCamera);
+            };
+            compAnimate();
+        }
+
+        function renderCompCyclone(record) {
+            if (!compCycloneGroup || !record) return;
+            clearThreeGroup(compCycloneGroup);
+
+            const D = Math.max(0.001, Number(record.D) || 0.001);
+            const a = Math.max(0.001, Number(record.a) || 0.001);
+            const b = Math.max(0.001, Number(record.b) || 0.001);
+            const De = Math.max(0.001, Number(record.De) || 0.001);
+            const S = Math.max(0, Number(record.S) || 0);
+            const h = Math.max(0.001, Number(record.h) || 0.001);
+            const H = Math.max(0.001, Number(record.H) || 0.001);
+            const B = Math.max(0.001, Number(record.B) || 0.001);
+            const dark = isDarkMode();
+            const segs = ensurePerformanceProfile().geometrySegments;
+            const segsAlt = Math.max(16, Math.floor(segs * 2 / 3));
+
+            const glassColor = dark ? 0x94a3b8 : 0xcbd5e1;
+            const lineColor = dark ? 0x3b82f6 : 0x94a3b8;
+            const glassMat = new THREE.MeshPhongMaterial({ color: glassColor, transparent: true, opacity: 0.15, side: THREE.DoubleSide, shininess: 100, depthWrite: false });
+            const lineMat = new THREE.LineBasicMaterial({ color: lineColor, transparent: true, opacity: 0.3 });
+
+            function addPart(geometry, yPos, xPos = 0, zPos = 0) {
+                const mesh = new THREE.Mesh(geometry, glassMat);
+                mesh.position.set(xPos, yPos, zPos);
+                mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geometry), lineMat));
+                compCycloneGroup.add(mesh);
+                return mesh;
+            }
+
+            addPart(new THREE.CylinderGeometry(D / 2, D / 2, h, segs, 1, true), h / 2);
+            const coneHeight = Math.max(0.001, H - h);
+            addPart(new THREE.CylinderGeometry(D / 2, B / 2, coneHeight, segs, 1, true), -coneHeight / 2);
+            const dustH = 1.0;
+            addPart(new THREE.CylinderGeometry(B / 2, B / 2, dustH, segsAlt, 1, true), -coneHeight - dustH / 2);
+            const vfLength = S + 0.5;
+            const vfCenterY = h + 0.25 - S / 2;
+            addPart(new THREE.CylinderGeometry(De / 2, De / 2, vfLength, segsAlt, 1, true), vfCenterY);
+            const inlet = addPart(new THREE.BoxGeometry(D, a, b), h - a / 2);
+            inlet.position.set(D / 2, h - a / 2, 0);
+            compCycloneGroup.position.y = (coneHeight - h) / 2;
+
+            // --- Particle system for comparison 3D ---
+            if (compParticleGroup) {
+                clearThreeGroup(compParticleGroup);
+                compParticleGroup.position.y = compCycloneGroup.position.y;
+
+                const effStr = record.eff || '50%';
+                const effVal = parseFloat(String(effStr).replace(/[^0-9.-]/g, '')) || 50;
+                const totalCount = Math.min(ensurePerformanceProfile().particleCount, 200);
+                const heavyCount = Math.floor(totalCount * (effVal / 100));
+                const lightCount = totalCount - heavyCount;
+
+                compHeavyData = []; compLightData = [];
+
+                const createCompParticle = (i, positions, type) => {
+                    const startAngle = Math.random() * Math.PI * 2;
+                    const r = (D / 2) - (Math.random() * b * 0.8);
+                    positions[i * 3] = r * Math.cos(startAngle) + (D / 2);
+                    positions[i * 3 + 1] = h - (Math.random() * a);
+                    positions[i * 3 + 2] = r * Math.sin(startAngle);
+                    const dataObj = {
+                        angle: startAngle, radius: r, targetRadius: r,
+                        vSpeed: (0.02 + Math.random() * 0.03),
+                        rotSpeed: (0.05 + Math.random() * 0.05),
+                        phase: 'entering',
+                        randomOffset: (Math.random() - 0.5) * 0.1
+                    };
+                    if (type === 'heavy') compHeavyData[i] = dataObj; else compLightData[i] = dataObj;
+                };
+
+                const createCompPoints = (count, colorHex, isHeavy) => {
+                    const geo = new THREE.BufferGeometry();
+                    const pos = new Float32Array(count * 3);
+                    for (let i = 0; i < count; i++) createCompParticle(i, pos, isHeavy ? 'heavy' : 'light');
+                    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+                    const mat = new THREE.PointsMaterial({ color: colorHex, size: 0.05, transparent: true, opacity: 0.8, depthWrite: false });
+                    const pts = new THREE.Points(geo, mat);
+                    compParticleGroup.add(pts);
+                    return pts;
+                };
+
+                compParticlesHeavy = createCompPoints(heavyCount, dark ? 0xfacc15 : 0xd97706, true);
+                compParticlesLight = createCompPoints(lightCount, dark ? 0xffffff : 0x2563eb, false);
+
+                // Store record dimensions for particle updates
+                compParticleDims = { D, a, b, De, S, h, H, B, coneHeight };
+            }
+        }
+
+        function renderComp3DTabs() {
+            const tabsDiv = document.getElementById('comp-3d-tabs');
+            if (!tabsDiv) return;
+
+            const tabDark = isDarkMode();
+            tabsDiv.innerHTML = compRecords.map((rec, idx) => {
+                const c = COMP_COLORS[idx % COMP_COLORS.length];
+                const active = idx === compActiveProductIdx;
+                const txt = tabDark ? c.textDark : c.textLight;
+                const activeBg = tabDark ? '#1e293b' : '#f1f5f9';
+                const activeBorder = tabDark ? '#475569' : '#cbd5e1';
+                const activeStyle = `color:${txt};background:${activeBg};border:1px solid ${activeBorder}`;
+                const inactiveStyle = `color:${tabDark ? '#94a3b8' : '#64748b'}`;
+                return `<button onclick="switchCompProduct(${idx})"
+                    class="px-3 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap"
+                    style="${active ? activeStyle : inactiveStyle}">
+                    #${idx + 1} ${escapeHtml(rec.productName || 'Unnamed')}
+                </button>`;
+            }).join('');
+        }
+
+        function switchCompProduct(idx) {
+            if (!Number.isInteger(idx) || idx < 0 || idx >= compRecords.length) return;
+            compActiveProductIdx = idx;
+            renderComp3DTabs();
+            renderCompCyclone(compRecords[idx]);
+        }
+
+        function onComparisonResize() {
+            if (!compRenderer || !compCamera) return;
+            const container = document.getElementById('comp-3d-container');
+            if (!container) return;
+            compCamera.aspect = container.clientWidth / Math.max(1, container.clientHeight);
+            compCamera.updateProjectionMatrix();
+            compRenderer.setSize(container.clientWidth, container.clientHeight);
+            compRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, ensurePerformanceProfile().pixelRatioCap));
+        }
+
+        function getCompSpeed() {
+            return parseFloat((document.getElementById('comp-flow-speed') || {}).value) || 1.0;
+        }
+
+        function updateCompParticles() {
+            if (!compParticlesHeavy || !compParticlesLight || !compParticleDims) return;
+            const dims = compParticleDims;
+            const spd = getCompSpeed();
+            runCompParticleLogic(compParticlesHeavy, compHeavyData, true, dims, spd);
+            runCompParticleLogic(compParticlesLight, compLightData, false, dims, spd);
+        }
+
+        function runCompParticleLogic(pts, dataArr, isHeavy, dims, spd) {
+            const pos = pts.geometry.attributes.position.array;
+            for (let i = 0; i < dataArr.length; i++) {
+                let p = dataArr[i];
+                let x = pos[i * 3], y = pos[i * 3 + 1], z = pos[i * 3 + 2];
+
+                if (p.phase === 'entering') {
+                    pos[i * 3] -= 0.1 * spd;
+                    if (pos[i * 3] <= p.radius) {
+                        p.phase = 'outer_vortex';
+                        let ratioVal = Math.max(-1, Math.min(1, pos[i * 3] / p.radius));
+                        p.angle = Math.acos(ratioVal) || 0;
+                    }
+                } else if (p.phase === 'outer_vortex') {
+                    p.angle += p.rotSpeed * spd;
+                    y -= p.vSpeed * spd;
+                    let maxR = dims.D / 2 - 0.02;
+                    if (y < 0) {
+                        if (y >= -dims.coneHeight) {
+                            const progress = Math.abs(y) / dims.coneHeight;
+                            maxR = (dims.D / 2 * (1 - progress)) + (dims.B / 2 * progress) - 0.02;
+                        } else {
+                            maxR = dims.B / 2 - 0.02;
+                        }
+                    }
+                    maxR = Math.max(0.001, maxR);
+                    if (isHeavy) {
+                        p.radius += (maxR - p.radius) * Math.min(1, 0.2 * spd);
+                        p.radius = Math.min(Math.max(0.001, p.radius), maxR);
+                        if (y < -dims.coneHeight + 0.1) p.phase = 'dust_drop';
+                    } else {
+                        const targetOuterR = Math.max(0.001, maxR * 0.8);
+                        p.radius += (targetOuterR - p.radius) * Math.min(1, 0.1 * spd);
+                        p.radius = Math.min(Math.max(0.001, p.radius), Math.max(0.001, maxR - 0.02));
+                        const turnaround = -(dims.coneHeight * 0.5) - (Math.random() * (dims.coneHeight * 0.4));
+                        if (y < turnaround) {
+                            p.phase = 'inner_vortex';
+                            p.vSpeed = Math.abs(p.vSpeed) * 1.5;
+                            p.rotSpeed *= 2;
+                        }
+                    }
+                    pos[i * 3] = p.radius * Math.cos(p.angle);
+                    pos[i * 3 + 1] = y;
+                    pos[i * 3 + 2] = p.radius * Math.sin(p.angle);
+                } else if (p.phase === 'dust_drop' && isHeavy) {
+                    y -= (p.vSpeed * 2) * spd;
+                    p.angle += p.rotSpeed * 0.5 * spd;
+                    const targetDustR = Math.max(0.001, dims.B / 2 - 0.02);
+                    p.radius += (targetDustR - p.radius) * Math.min(1, 0.3 * spd);
+                    p.radius = Math.min(Math.max(0.001, p.radius), targetDustR);
+                    pos[i * 3] = p.radius * Math.cos(p.angle);
+                    pos[i * 3 + 1] = y;
+                    pos[i * 3 + 2] = p.radius * Math.sin(p.angle);
+                    if (y < -dims.coneHeight - 1.0) {
+                        resetCompParticle(i, pos, 'heavy', dims);
+                    }
+                } else if (p.phase === 'inner_vortex' && !isHeavy) {
+                    p.angle += p.rotSpeed * spd;
+                    y += p.vSpeed * spd;
+                    const innerR = (dims.De / 2) * 0.7 * (1 + p.randomOffset);
+                    const currentR = Math.sqrt(x * x + z * z);
+                    const newR = currentR + (innerR - currentR) * Math.min(1, 0.1 * spd);
+                    pos[i * 3] = newR * Math.cos(p.angle);
+                    pos[i * 3 + 1] = y;
+                    pos[i * 3 + 2] = newR * Math.sin(p.angle);
+                    if (y > dims.h + 1.0) {
+                        resetCompParticle(i, pos, 'light', dims);
+                    }
+                }
+            }
+            pts.geometry.attributes.position.needsUpdate = true;
+        }
+
+        function resetCompParticle(i, pos, type, dims) {
+            const startAngle = Math.random() * Math.PI * 2;
+            const r = (dims.D / 2) - (Math.random() * dims.b * 0.8);
+            pos[i * 3] = r * Math.cos(startAngle) + (dims.D / 2);
+            pos[i * 3 + 1] = dims.h - (Math.random() * dims.a);
+            pos[i * 3 + 2] = r * Math.sin(startAngle);
+            const target = type === 'heavy' ? compHeavyData : compLightData;
+            if (target && target[i]) {
+                target[i].angle = startAngle; target[i].radius = r; target[i].phase = 'entering';
+                target[i].vSpeed = 0.02 + Math.random() * 0.03;
+                target[i].rotSpeed = 0.05 + Math.random() * 0.05;
+            }
+        }
+
+        function disposeCompGridCells() {
+            compGridCells.forEach(cell => {
+                if (cell.animId) cancelAnimationFrame(cell.animId);
+                if (cell.controls && cell.controls.dispose) cell.controls.dispose();
+                if (cell.cycloneGroup) clearThreeGroup(cell.cycloneGroup);
+                if (cell.particleGroup) clearThreeGroup(cell.particleGroup);
+                if (cell.renderer) {
+                    if (cell.renderer.domElement && cell.renderer.domElement.parentNode) {
+                        cell.renderer.domElement.parentNode.removeChild(cell.renderer.domElement);
+                    }
+                    cell.renderer.dispose();
+                }
+            });
+            compGridCells = [];
+            const gridDiv = document.getElementById('comp-3d-grid');
+            if (gridDiv) gridDiv.innerHTML = '';
+        }
+
+        function toggleCompGridMode() {
+            compGridMode = !compGridMode;
+            const singleContainer = document.getElementById('comp-3d-container');
+            const gridContainer = document.getElementById('comp-3d-grid');
+            const gridBtn = document.getElementById('comp-grid-btn');
+            const tabsDiv = document.getElementById('comp-3d-tabs');
+
+            if (compGridMode) {
+                if (gridBtn) { gridBtn.style.background = '#3b82f6'; gridBtn.style.color = '#fff'; gridBtn.style.borderColor = '#2563eb'; }
+                if (singleContainer) singleContainer.style.display = 'none';
+                if (tabsDiv) tabsDiv.style.display = 'none';
+                if (gridContainer) {
+                    gridContainer.style.display = 'grid';
+                    // Responsive: 1 col on very small, 2 col on medium, auto-fit for larger
+                    const count = compRecords.length;
+                    if (count <= 2) {
+                        gridContainer.style.gridTemplateColumns = window.innerWidth < 500 ? '1fr' : 'repeat(2,1fr)';
+                    } else {
+                        gridContainer.style.gridTemplateColumns = window.innerWidth < 500 ? '1fr' : 'repeat(auto-fit,minmax(240px,1fr))';
+                    }
+                }
+                buildCompGrid();
+            } else {
+                if (gridBtn) { gridBtn.style.background = ''; gridBtn.style.color = ''; gridBtn.style.borderColor = ''; }
+                disposeCompGridCells();
+                if (gridContainer) gridContainer.style.display = 'none';
+                if (singleContainer) singleContainer.style.display = '';
+                if (tabsDiv) tabsDiv.style.display = '';
+                renderComp3DTabs();
+                renderCompCyclone(compRecords[compActiveProductIdx] || compRecords[0]);
+                // Re-fit renderer to container after switching back
+                requestAnimationFrame(() => onComparisonResize());
+            }
+        }
+
+        function buildCompGrid() {
+            disposeCompGridCells();
+            const gridDiv = document.getElementById('comp-3d-grid');
+            if (!gridDiv || !compRecords || compRecords.length === 0) return;
+
+            const dark = isDarkMode();
+            const perf = ensurePerformanceProfile();
+            const gridParticleCount = Math.min(80, Math.floor(perf.particleCount / 2));
+            const gridSegs = Math.max(16, Math.floor(perf.geometrySegments / 2));
+
+            compRecords.forEach((rec, idx) => {
+                const c = COMP_COLORS[idx % COMP_COLORS.length];
+                const wrapper = document.createElement('div');
+                wrapper.style.cssText = `position:relative;border-radius:0.75rem;overflow:hidden;min-height:220px;border:2px solid ${c.borderColor};`;
+                wrapper.style.background = dark ? 'linear-gradient(135deg,#1e293b,#020617)' : 'linear-gradient(135deg,#f1f5f9,#cbd5e1)';
+
+                // Label
+                const label = document.createElement('div');
+                label.style.cssText = `position:absolute;top:8px;left:8px;z-index:2;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:700;`;
+                label.style.background = dark ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.8)';
+                label.style.color = dark ? c.textDark : c.textLight;
+                label.textContent = `#${idx + 1} ${rec.productName || 'Unnamed'}`;
+                wrapper.appendChild(label);
+
+                gridDiv.appendChild(wrapper);
+
+                // Create mini Three.js scene
+                const cellScene = new THREE.Scene();
+                const cellCamera = new THREE.PerspectiveCamera(45, wrapper.clientWidth / Math.max(1, wrapper.clientHeight), 0.1, 1000);
+                cellCamera.position.set(6, 2, 8);
+
+                const cellRenderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
+                cellRenderer.setSize(wrapper.clientWidth, wrapper.clientHeight);
+                cellRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+                wrapper.appendChild(cellRenderer.domElement);
+                cellRenderer.domElement.style.cssText = 'position:absolute;inset:0;width:100%;height:100%';
+
+                const cellControls = new THREE.OrbitControls(cellCamera, cellRenderer.domElement);
+                cellControls.enableDamping = true;
+                cellControls.target.set(0, 0, 0);
+
+                cellScene.add(new THREE.AmbientLight(0xffffff, 0.8));
+                const dl = new THREE.DirectionalLight(0xffffff, 1); dl.position.set(10, 20, 10); cellScene.add(dl);
+
+                const cycloneGrp = new THREE.Group();
+                cellScene.add(cycloneGrp);
+                const particleGrp = new THREE.Group();
+                cellScene.add(particleGrp);
+
+                // Build cyclone model
+                const D = Math.max(0.001, Number(rec.D) || 1);
+                const a = Math.max(0.001, Number(rec.a) || 0.5);
+                const b = Math.max(0.001, Number(rec.b) || 0.25);
+                const De = Math.max(0.001, Number(rec.De) || 0.5);
+                const S = Math.max(0, Number(rec.S) || 0);
+                const h = Math.max(0.001, Number(rec.h) || 2);
+                const H = Math.max(0.001, Number(rec.H) || 4);
+                const B = Math.max(0.001, Number(rec.B) || 0.25);
+                const coneHeight = Math.max(0.001, H - h);
+
+                const glassColor = dark ? 0x94a3b8 : 0xcbd5e1;
+                const glassMat = new THREE.MeshPhongMaterial({ color: glassColor, transparent: true, opacity: 0.15, side: THREE.DoubleSide, shininess: 100, depthWrite: false });
+                const lineMat = new THREE.LineBasicMaterial({ color: dark ? 0x3b82f6 : 0x94a3b8, transparent: true, opacity: 0.3 });
+                const addP = (geo, yP, xP = 0, zP = 0) => {
+                    const m = new THREE.Mesh(geo, glassMat);
+                    m.position.set(xP, yP, zP);
+                    m.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo), lineMat));
+                    cycloneGrp.add(m); return m;
+                };
+                addP(new THREE.CylinderGeometry(D / 2, D / 2, h, gridSegs, 1, true), h / 2);
+                addP(new THREE.CylinderGeometry(D / 2, B / 2, coneHeight, gridSegs, 1, true), -coneHeight / 2);
+                addP(new THREE.CylinderGeometry(B / 2, B / 2, 1, gridSegs, 1, true), -coneHeight - 0.5);
+                addP(new THREE.CylinderGeometry(De / 2, De / 2, S + 0.5, gridSegs, 1, true), h + 0.25 - S / 2);
+                const inlet = addP(new THREE.BoxGeometry(D, a, b), h - a / 2);
+                inlet.position.set(D / 2, h - a / 2, 0);
+                cycloneGrp.position.y = (coneHeight - h) / 2;
+                particleGrp.position.y = cycloneGrp.position.y;
+
+                // Build particles
+                const effVal = parseFloat(String(rec.eff || '50').replace(/[^0-9.-]/g, '')) || 50;
+                const heavyCount = Math.floor(gridParticleCount * (effVal / 100));
+                const lightCount = gridParticleCount - heavyCount;
+                const cellHeavyData = [], cellLightData = [];
+                const dims = { D, a, b, De, S, h, H, B, coneHeight };
+
+                const initP = (i, positions, type) => {
+                    const sa = Math.random() * Math.PI * 2;
+                    const r = (D / 2) - (Math.random() * b * 0.8);
+                    positions[i * 3] = r * Math.cos(sa) + (D / 2);
+                    positions[i * 3 + 1] = h - (Math.random() * a);
+                    positions[i * 3 + 2] = r * Math.sin(sa);
+                    const obj = { angle: sa, radius: r, targetRadius: r, vSpeed: 0.02 + Math.random() * 0.03, rotSpeed: 0.05 + Math.random() * 0.05, phase: 'entering', randomOffset: (Math.random() - 0.5) * 0.1 };
+                    if (type === 'heavy') cellHeavyData[i] = obj; else cellLightData[i] = obj;
+                };
+                const mkPts = (count, color, isH) => {
+                    const geo = new THREE.BufferGeometry();
+                    const pos = new Float32Array(count * 3);
+                    for (let i = 0; i < count; i++) initP(i, pos, isH ? 'heavy' : 'light');
+                    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+                    const pts = new THREE.Points(geo, new THREE.PointsMaterial({ color, size: 0.05, transparent: true, opacity: 0.8, depthWrite: false }));
+                    particleGrp.add(pts); return pts;
+                };
+                const pH = mkPts(heavyCount, dark ? 0xfacc15 : 0xd97706, true);
+                const pL = mkPts(lightCount, dark ? 0xffffff : 0x2563eb, false);
+
+                const cell = { scene: cellScene, camera: cellCamera, renderer: cellRenderer, controls: cellControls, cycloneGroup: cycloneGrp, particleGroup: particleGrp, particlesH: pH, particlesL: pL, heavyData: cellHeavyData, lightData: cellLightData, dims, animId: null, wrapper };
+
+                // Grid cell animation loop
+                const animateCell = () => {
+                    if (!comp3DActive || !compGridMode) return;
+                    cell.animId = requestAnimationFrame(animateCell);
+                    cell.controls.update();
+                    const spd = getCompSpeed();
+                    runGridCellParticles(cell, spd);
+                    cell.renderer.render(cell.scene, cell.camera);
+                };
+                cell.animId = requestAnimationFrame(animateCell);
+                compGridCells.push(cell);
+            });
+        }
+
+        function runGridCellParticles(cell, spd) {
+            if (!cell.particlesH || !cell.particlesL) return;
+            const dims = cell.dims;
+            const resetP = (i, pos, type) => {
+                const sa = Math.random() * Math.PI * 2;
+                const r = (dims.D / 2) - (Math.random() * dims.b * 0.8);
+                pos[i * 3] = r * Math.cos(sa) + (dims.D / 2);
+                pos[i * 3 + 1] = dims.h - (Math.random() * dims.a);
+                pos[i * 3 + 2] = r * Math.sin(sa);
+                const arr = type === 'heavy' ? cell.heavyData : cell.lightData;
+                if (arr[i]) { arr[i].angle = sa; arr[i].radius = r; arr[i].phase = 'entering'; arr[i].vSpeed = 0.02 + Math.random() * 0.03; arr[i].rotSpeed = 0.05 + Math.random() * 0.05; }
+            };
+            const proc = (pts, dataArr, isH) => {
+                const pos = pts.geometry.attributes.position.array;
+                for (let i = 0; i < dataArr.length; i++) {
+                    let p = dataArr[i], x = pos[i * 3], y = pos[i * 3 + 1], z = pos[i * 3 + 2];
+                    if (p.phase === 'entering') {
+                        pos[i * 3] -= 0.1 * spd;
+                        if (pos[i * 3] <= p.radius) { p.phase = 'outer_vortex'; p.angle = Math.acos(Math.max(-1, Math.min(1, pos[i * 3] / p.radius))) || 0; }
+                    } else if (p.phase === 'outer_vortex') {
+                        p.angle += p.rotSpeed * spd; y -= p.vSpeed * spd;
+                        let maxR = dims.D / 2 - 0.02;
+                        if (y < 0) { if (y >= -dims.coneHeight) { const pr = Math.abs(y) / dims.coneHeight; maxR = (dims.D / 2 * (1 - pr)) + (dims.B / 2 * pr) - 0.02; } else { maxR = dims.B / 2 - 0.02; } }
+                        maxR = Math.max(0.001, maxR);
+                        if (isH) { p.radius += (maxR - p.radius) * Math.min(1, 0.2 * spd); p.radius = Math.min(Math.max(0.001, p.radius), maxR); if (y < -dims.coneHeight + 0.1) p.phase = 'dust_drop'; }
+                        else { p.radius += (Math.max(0.001, maxR * 0.8) - p.radius) * Math.min(1, 0.1 * spd); p.radius = Math.min(Math.max(0.001, p.radius), Math.max(0.001, maxR - 0.02)); if (y < -(dims.coneHeight * 0.5) - (Math.random() * dims.coneHeight * 0.4)) { p.phase = 'inner_vortex'; p.vSpeed = Math.abs(p.vSpeed) * 1.5; p.rotSpeed *= 2; } }
+                        pos[i * 3] = p.radius * Math.cos(p.angle); pos[i * 3 + 1] = y; pos[i * 3 + 2] = p.radius * Math.sin(p.angle);
+                    } else if (p.phase === 'dust_drop' && isH) {
+                        y -= p.vSpeed * 2 * spd; p.angle += p.rotSpeed * 0.5 * spd;
+                        const tr = Math.max(0.001, dims.B / 2 - 0.02); p.radius += (tr - p.radius) * Math.min(1, 0.3 * spd); p.radius = Math.min(Math.max(0.001, p.radius), tr);
+                        pos[i * 3] = p.radius * Math.cos(p.angle); pos[i * 3 + 1] = y; pos[i * 3 + 2] = p.radius * Math.sin(p.angle);
+                        if (y < -dims.coneHeight - 1.0) resetP(i, pos, 'heavy');
+                    } else if (p.phase === 'inner_vortex' && !isH) {
+                        p.angle += p.rotSpeed * spd; y += p.vSpeed * spd;
+                        const ir = (dims.De / 2) * 0.7 * (1 + p.randomOffset); const cr = Math.sqrt(x * x + z * z); const nr = cr + (ir - cr) * Math.min(1, 0.1 * spd);
+                        pos[i * 3] = nr * Math.cos(p.angle); pos[i * 3 + 1] = y; pos[i * 3 + 2] = nr * Math.sin(p.angle);
+                        if (y > dims.h + 1.0) resetP(i, pos, 'light');
+                    }
+                }
+                pts.geometry.attributes.position.needsUpdate = true;
+            };
+            proc(cell.particlesH, cell.heavyData, true);
+            proc(cell.particlesL, cell.lightData, false);
+        }
+
+        function disposeComparison3D() {
+            if (compAnimationFrameId) {
+                cancelAnimationFrame(compAnimationFrameId);
+                compAnimationFrameId = null;
+            }
+            disposeCompGridCells();
+            compGridMode = false;
+            window.removeEventListener('resize', onComparisonResize);
+
+            if (compControls && compControls.dispose) compControls.dispose();
+            compControls = null;
+
+            if (compCycloneGroup) clearThreeGroup(compCycloneGroup);
+            compCycloneGroup = null;
+
+            if (compParticleGroup) clearThreeGroup(compParticleGroup);
+            compParticleGroup = null;
+            compParticlesHeavy = null;
+            compParticlesLight = null;
+            compHeavyData = [];
+            compLightData = [];
+            compParticleDims = null;
+
+            if (compRenderer) {
+                const container = document.getElementById('comp-3d-container');
+                if (container && compRenderer.domElement.parentNode === container) {
+                    container.removeChild(compRenderer.domElement);
+                }
+                compRenderer.dispose();
+            }
+
+            compScene = null;
+            compCamera = null;
+            compRenderer = null;
+            comp3DActive = false;
+            compActiveProductIdx = 0;
+
+            const wrapper = document.getElementById('comp-3d-wrapper');
+            const status = document.getElementById('comp-3d-status');
+            if (wrapper) wrapper.classList.add('hidden');
+            if (status) status.textContent = 'OFF';
+            const gridBtn = document.getElementById('comp-grid-btn');
+            if (gridBtn) { gridBtn.style.background = ''; gridBtn.style.color = ''; gridBtn.style.borderColor = ''; }
+        }
+
+        function toggleHistoryModal() {
+            toggleMobileActionMenu(false);
+            const modal = document.getElementById('history-modal');
+            const content = document.getElementById('history-modal-content');
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                modal.setAttribute('aria-hidden', 'false');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    content.classList.remove('scale-95');
+                }, 10);
+            } else {
+                modal.classList.add('opacity-0');
+                content.classList.add('scale-95');
+                modal.setAttribute('aria-hidden', 'true');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+        }
+
+        // --- 5. THREE.JS IMPLEMENTATION ---
+        let scene, camera, renderer, controls, cycloneGroup, particleGroup;
+        let particlesHeavy, particlesLight;
+        let heavyData = [], lightData = [];
+        let debugSyncEnabled = false;
+        let lastDebugUpdateTs = 0;
+        let perfProfile = null;
+        let lastFrameTime = 0;
+        let is3DReady = false;
+        let suspendStatePersistence = true;
+        let threeLoaderPromise = null;
+
+        function isDarkMode() { return document.documentElement.classList.contains('dark'); }
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            if (is3DReady) {
+                updateCycloneModel();
+                initParticles();
+            }
+            if (comp3DActive && compRecords.length > 0) {
+                renderCompCyclone(compRecords[compActiveProductIdx] || compRecords[0]);
+            }
+            scheduleSaveAppState();
+        }
+
+        function getPerformanceProfile() {
+            const cores = navigator.hardwareConcurrency || 4;
+            const memory = navigator.deviceMemory || 4;
+            const isVeryLowEnd = cores <= 2 || memory <= 2;
+            const isLowEnd = isVeryLowEnd || cores <= 4 || memory <= 3;
+            return {
+                lowEnd: isLowEnd,
+                veryLowEnd: isVeryLowEnd,
+                antialias: !isLowEnd,
+                pixelRatioCap: isVeryLowEnd ? 1 : 1.5,
+                particleCount: isVeryLowEnd ? 500 : isLowEnd ? 1000 : 2500,
+                geometrySegments: isLowEnd ? 24 : 48,
+                frameIntervalMs: isLowEnd ? (1000 / 30) : (1000 / 60)
+            };
+        }
+
+        function ensurePerformanceProfile() {
+            if (!perfProfile) perfProfile = getPerformanceProfile();
+            return perfProfile;
+        }
+
+        function runIdleTask(task, timeoutMs = 1500) {
+            const runner = () => Promise.resolve().then(task).catch((error) => {
+                console.warn('Deferred task gagal:', error);
+            });
+
+            if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+                window.requestIdleCallback(runner, { timeout: timeoutMs });
+                return;
+            }
+            setTimeout(runner, 0);
+        }
+
+        function runTaskAfterFirstPaint(task, timeoutMs = 1500) {
+            requestAnimationFrame(() => runIdleTask(task, timeoutMs));
+        }
+
+        function loadExternalScript(src) {
+            return new Promise((resolve, reject) => {
+                const existing = document.querySelector(`script[src="${src}"]`);
+                if (existing) {
+                    if (existing.dataset.loaded === 'true') {
+                        resolve();
+                        return;
+                    }
+                    existing.addEventListener('load', () => resolve(), { once: true });
+                    existing.addEventListener('error', () => reject(new Error(`Gagal memuat ${src}`)), { once: true });
+                    return;
+                }
+
+                const script = document.createElement('script');
+                script.src = src;
+                script.async = true;
+                script.dataset.loaded = 'false';
+                script.addEventListener('load', () => {
+                    script.dataset.loaded = 'true';
+                    resolve();
+                }, { once: true });
+                script.addEventListener('error', () => reject(new Error(`Gagal memuat ${src}`)), { once: true });
+                document.head.appendChild(script);
+            });
+        }
+
+        async function ensureThreeLibrariesLoaded() {
+            if (typeof THREE !== 'undefined' && typeof THREE.OrbitControls !== 'undefined') return;
+            if (!threeLoaderPromise) {
+                threeLoaderPromise = (async () => {
+                    await loadExternalScript('./vendor/three.min.js');
+                    await loadExternalScript('./vendor/OrbitControls.js');
+                })();
+            }
+            await threeLoaderPromise;
+        }
+
+        function setupConnectionBanner() {
+            const banner = document.getElementById('offline-banner');
+            if (!banner) return;
+
+            const updateBanner = () => {
+                banner.classList.toggle('hidden', navigator.onLine);
+            };
+
+            window.addEventListener('online', updateBanner);
+            window.addEventListener('offline', updateBanner);
+            updateBanner();
+        }
+
+        function toggleMobileActionMenu(forceOpen) {
+            const menu = document.getElementById('mobile-action-menu');
+            const backdrop = document.getElementById('mobile-action-backdrop');
+            const trigger = document.getElementById('mobile-menu-btn');
+            if (!menu || !backdrop) return;
+
+            const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !menu.classList.contains('is-open');
+            menu.classList.toggle('is-open', shouldOpen);
+            menu.setAttribute('aria-hidden', shouldOpen ? 'false' : 'true');
+            backdrop.classList.toggle('is-open', shouldOpen);
+            document.body.classList.toggle('drawer-open', shouldOpen);
+            if (trigger) trigger.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+        }
+
+        function openHistoryFromMobileMenu() {
+            toggleMobileActionMenu(false);
+            toggleHistoryModal();
+        }
+
+        function showUpdateBanner(show) {
+            const banner = document.getElementById('update-banner');
+            if (!banner) return;
+            banner.classList.toggle('hidden', !show);
+        }
+
+        function setWaitingServiceWorker(worker) {
+            waitingServiceWorker = worker || null;
+            showUpdateBanner(Boolean(waitingServiceWorker));
+        }
+
+        function applyUpdate() {
+            if (!waitingServiceWorker) return;
+            showUpdateBanner(false);
+            waitingServiceWorker.postMessage({ type: 'SKIP_WAITING' });
+        }
+
+        function toggleDebugSyncPanel() {
+            debugSyncEnabled = !debugSyncEnabled;
+            const panel = document.getElementById('debug-sync-panel');
+            const toggle = document.getElementById('debug-sync-toggle');
+            if (!panel || !toggle) return;
+
+            panel.classList.toggle('hidden', !debugSyncEnabled);
+            toggle.classList.toggle('bg-emerald-700', debugSyncEnabled);
+            toggle.classList.toggle('hover:bg-emerald-600', debugSyncEnabled);
+            toggle.classList.toggle('border-emerald-300/40', debugSyncEnabled);
+            updateDebugSyncPanel(true);
+        }
+
+        function updateDebugSyncPanel(force = false) {
+            if (!debugSyncEnabled && !force) return;
+
+            const now = performance.now();
+            if (!force && now - lastDebugUpdateTs < 120) return;
+            lastDebugUpdateTs = now;
+
+            const cycloneY = cycloneGroup ? cycloneGroup.position.y : NaN;
+            const particleY = particleGroup ? particleGroup.position.y : NaN;
+            const deltaY = cycloneY - particleY;
+
+            const cycloneYNode = document.getElementById('debug-cyclone-y');
+            const particleYNode = document.getElementById('debug-particle-y');
+            const deltaYNode = document.getElementById('debug-delta-y');
+            if (!cycloneYNode || !particleYNode || !deltaYNode) return;
+
+            const fmt = (value) => Number.isFinite(value) ? value.toFixed(4) : '-';
+            cycloneYNode.textContent = fmt(cycloneY);
+            particleYNode.textContent = fmt(particleY);
+            deltaYNode.textContent = fmt(deltaY);
+            deltaYNode.className = Math.abs(deltaY) <= 0.001 ? 'text-emerald-300' : 'text-red-300';
+        }
+
+        function updateStorageStatus(statusText, isPersistent) {
+            const badge = document.getElementById('storage-status');
+            if (!badge) return;
+            badge.textContent = statusText;
+            badge.classList.remove('text-amber-700', 'dark:text-amber-400', 'text-emerald-700', 'dark:text-emerald-400');
+            if (isPersistent) {
+                badge.classList.add('text-emerald-700', 'dark:text-emerald-400');
+            } else {
+                badge.classList.add('text-amber-700', 'dark:text-amber-400');
+            }
+        }
+
+        async function getStorageEngineLabel() {
+            const db = await openStorageDB();
+            return db ? 'IndexedDB' : 'localStorage';
+        }
+
+
+
+        async function requestPersistentStorage() {
+            const storageEngine = await getStorageEngineLabel();
+            let statusText = `Storage: ${storageEngine} (standar)`;
+            let isPersistent = false;
+
+            if ('storage' in navigator && navigator.storage) {
+                try {
+                    if (navigator.storage.persisted && await navigator.storage.persisted()) {
+                        statusText = `Storage: ${storageEngine} (persisten)`;
+                        isPersistent = true;
+                    } else if (navigator.storage.persist) {
+                        const granted = await navigator.storage.persist();
+                        statusText = granted ? `Storage: ${storageEngine} (persisten)` : `Storage: ${storageEngine} (standar)`;
+                        isPersistent = granted;
+                    }
+                } catch (error) {
+                    console.warn('Gagal meminta persistent storage:', error);
+                }
+            }
+
+            updateStorageStatus(statusText, isPersistent);
+        }
+
+        async function registerServiceWorker() {
+            if (!('serviceWorker' in navigator)) return;
+            try {
+                const registration = await navigator.serviceWorker.register('./sw.js');
+
+                if (registration.waiting) {
+                    setWaitingServiceWorker(registration.waiting);
+                }
+
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    if (!newWorker) return;
+
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            setWaitingServiceWorker(newWorker);
+                        }
+                    });
+                });
+
+                navigator.serviceWorker.addEventListener('message', (event) => {
+                    if (!event.data) return;
+                    if (event.data.type === 'SW_UPDATE_AVAILABLE' && registration.waiting) {
+                        setWaitingServiceWorker(registration.waiting);
+                    }
+                });
+
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    window.location.reload();
+                });
+
+                setInterval(() => {
+                    registration.update().catch(() => { });
+                }, 30 * 60 * 1000);
+            } catch (error) {
+                console.warn('Service worker gagal didaftarkan:', error);
+            }
+        }
+
+        function isStandaloneMode() {
+            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        }
+
+        function showInstallHelp() {
+            const ua = navigator.userAgent || '';
+            const isIOS = /iphone|ipad|ipod/i.test(ua);
+            const isAndroid = /android/i.test(ua);
+            const isDesktop = !isIOS && !isAndroid;
+
+            if (isIOS) {
+                alert('Install di iPhone/iPad: buka menu Share di Safari, lalu pilih "Add to Home Screen".');
+                return;
+            }
+
+            if (isAndroid) {
+                alert('Install di Android: buka menu browser (⋮) lalu pilih "Install app" atau "Add to Home screen".');
+                return;
+            }
+
+            if (isDesktop) {
+                alert('Install di Desktop: klik ikon install di address bar browser, atau buka menu browser lalu pilih "Install app".');
+                return;
+            }
+
+            alert('Install app via menu browser: "Install app" / "Add to Home screen".');
+        }
+
+        function setupInstallPrompt() {
+            const installButtons = Array.from(document.querySelectorAll('[data-install-app]'));
+            if (installButtons.length === 0) return;
+
+            const setInstalledState = (installed) => {
+                installButtons.forEach((button) => {
+                    if (installed) {
+                        button.textContent = 'Sudah Terpasang';
+                        button.disabled = true;
+                        button.classList.add('opacity-60', 'cursor-not-allowed');
+                    } else {
+                        button.textContent = 'Install / Download';
+                        button.disabled = false;
+                        button.classList.remove('opacity-60', 'cursor-not-allowed');
+                    }
+                });
+            };
+
+            setInstalledState(isStandaloneMode());
+
+            window.addEventListener('beforeinstallprompt', (event) => {
+                event.preventDefault();
+                deferredInstallPrompt = event;
+                if (!isStandaloneMode()) setInstalledState(false);
+            });
+
+            installButtons.forEach((installButton) => {
+                installButton.addEventListener('click', async () => {
+                    toggleMobileActionMenu(false);
+
+                    if (isStandaloneMode()) {
+                        setInstalledState(true);
+                        return;
+                    }
+
+                    if (!deferredInstallPrompt) {
+                        showInstallHelp();
+                        return;
+                    }
+
+                    deferredInstallPrompt.prompt();
+                    const choice = await deferredInstallPrompt.userChoice;
+                    deferredInstallPrompt = null;
+
+                    if (choice && choice.outcome === 'accepted') {
+                        setInstalledState(true);
+                    } else {
+                        setInstalledState(false);
+                    }
+                });
+            });
+
+            window.addEventListener('appinstalled', () => {
+                deferredInstallPrompt = null;
+                setInstalledState(true);
+                toggleMobileActionMenu(false);
+            });
+        }
+
+        async function init3D() {
+            if (is3DReady) return;
+            await ensureThreeLibrariesLoaded();
+            const container = document.getElementById('three-container');
+            if (!container) throw new Error('Container 3D tidak ditemukan.');
+            const perf = ensurePerformanceProfile();
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(6, 2, 8);
+
+            renderer = new THREE.WebGLRenderer({ antialias: perf.antialias, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, perf.pixelRatioCap));
+            container.appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.target.set(0, 0, 0);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); scene.add(ambientLight);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 1); dirLight.position.set(10, 20, 10); scene.add(dirLight);
+            const backLight = new THREE.DirectionalLight(0x60a5fa, 0.8); backLight.position.set(-10, 10, -10); scene.add(backLight);
+
+            cycloneGroup = new THREE.Group();
+            scene.add(cycloneGroup);
+            particleGroup = new THREE.Group();
+            scene.add(particleGroup);
+
+            window.addEventListener('resize', onWindowResize);
+
+            is3DReady = true;
+            calculatePhysics();
+            updateCycloneModel();
+            initParticles();
+            animate();
+        }
+
+        function updateCycloneModel() {
+            while (cycloneGroup.children.length > 0) cycloneGroup.remove(cycloneGroup.children[0]);
+
+            const D = getVal('geom-D'), a = getVal('geom-a'), b = getVal('geom-b'), De = getVal('geom-De');
+            const S = getVal('geom-S'), h = getVal('geom-h'), H = getVal('geom-H'), B = getVal('geom-B');
+            const dark = isDarkMode();
+            const segs = ensurePerformanceProfile().geometrySegments;
+            const segsAlt = Math.max(16, Math.floor(segs * 2 / 3));
+
+            const glassColor = dark ? 0x94a3b8 : 0xcbd5e1;
+            const lineColor = dark ? 0x3b82f6 : 0x94a3b8;
+
+            const glassMat = new THREE.MeshPhongMaterial({ color: glassColor, transparent: true, opacity: 0.15, side: THREE.DoubleSide, shininess: 100, depthWrite: false });
+            const lineMat = new THREE.LineBasicMaterial({ color: lineColor, transparent: true, opacity: 0.3 });
+
+            function addPart(geometry, yPos, xPos = 0, zPos = 0) {
+                const mesh = new THREE.Mesh(geometry, glassMat);
+                mesh.position.set(xPos, yPos, zPos);
+                mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geometry), lineMat));
+                cycloneGroup.add(mesh);
+                return mesh;
+            }
+
+            addPart(new THREE.CylinderGeometry(D / 2, D / 2, h, segs, 1, true), h / 2);
+
+            const coneHeight = Math.max(0.001, H - h);
+            addPart(new THREE.CylinderGeometry(D / 2, B / 2, coneHeight, segs, 1, true), -coneHeight / 2);
+
+            const dustH = 1.0;
+            addPart(new THREE.CylinderGeometry(B / 2, B / 2, dustH, segsAlt, 1, true), -coneHeight - dustH / 2);
+
+            const vfLength = S + 0.5;
+            const vfCenterY = h + 0.25 - S / 2;
+            addPart(new THREE.CylinderGeometry(De / 2, De / 2, vfLength, segsAlt, 1, true), vfCenterY);
+
+            const inlet = addPart(new THREE.BoxGeometry(D, a, b), h - a / 2);
+            inlet.position.set(D / 2, h - a / 2, 0);
+
+            cycloneGroup.position.y = (coneHeight - h) / 2;
+            if (particleGroup) particleGroup.position.y = cycloneGroup.position.y;
+            updateDebugSyncPanel(true);
+        }
+
+        function initParticles() {
+            if (particlesHeavy && particleGroup) particleGroup.remove(particlesHeavy);
+            if (particlesLight && particleGroup) particleGroup.remove(particlesLight);
+
+            const totalCount = ensurePerformanceProfile().particleCount;
+            const effStr = document.getElementById('res-eff').innerText;
+            const effVal = parseFloat(effStr.replace('%', '')) || 50;
+            const heavyCount = Math.floor(totalCount * (effVal / 100));
+            const lightCount = totalCount - heavyCount;
+
+            heavyData = []; lightData = [];
+            const dark = isDarkMode();
+
+            const createPoints = (count, colorHex, isHeavy) => {
+                const geo = new THREE.BufferGeometry();
+                const pos = new Float32Array(count * 3);
+                for (let i = 0; i < count; i++) resetParticle(i, pos, isHeavy ? 'heavy' : 'light');
+                geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+                const mat = new THREE.PointsMaterial({ color: colorHex, size: 0.05, transparent: true, opacity: 0.8, depthWrite: false });
+                const pts = new THREE.Points(geo, mat);
+                particleGroup.add(pts);
+                return pts;
+            };
+
+            particlesHeavy = createPoints(heavyCount, dark ? 0xfacc15 : 0xd97706, true);
+            particlesLight = createPoints(lightCount, dark ? 0xffffff : 0x2563eb, false);
+        }
+
+        function resetParticle(i, positions, type) {
+            const D = getVal('geom-D'), h = getVal('geom-h'), a = getVal('geom-a'), b = getVal('geom-b');
+            const startAngle = 0;
+            const r = (D / 2) - (Math.random() * b * 0.8);
+
+            positions[i * 3] = r * Math.cos(startAngle) + (D / 2);
+            positions[i * 3 + 1] = h - (Math.random() * a);
+            positions[i * 3 + 2] = r * Math.sin(startAngle);
+
+            const dataObj = {
+                angle: startAngle, radius: r, targetRadius: r,
+                vSpeed: (0.02 + Math.random() * 0.03), rotSpeed: (0.05 + Math.random() * 0.05),
+                phase: 'entering', randomOffset: (Math.random() - 0.5) * 0.1
+            };
+            if (type === 'heavy') heavyData[i] = dataObj; else lightData[i] = dataObj;
+        }
+
+        function updateParticlesLogic() {
+            if (!particlesHeavy || !particlesLight) return;
+
+            const D = getVal('geom-D'), h = getVal('geom-h'), H = getVal('geom-H');
+            const B = getVal('geom-B');
+            const De = getVal('geom-De'), coneHeight = Math.max(0.001, H - h);
+            const speedMult = parseFloat(document.getElementById('input-FlowSpeed').value) || 1.0;
+
+            const processParticles = (pts, dataArr, isHeavy) => {
+                const pos = pts.geometry.attributes.position.array;
+                for (let i = 0; i < dataArr.length; i++) {
+                    let p = dataArr[i];
+                    let x = pos[i * 3], y = pos[i * 3 + 1], z = pos[i * 3 + 2];
+
+                    if (p.phase === 'entering') {
+                        pos[i * 3] -= 0.1 * speedMult;
+                        if (pos[i * 3] <= p.radius) {
+                            p.phase = 'outer_vortex';
+                            // PENGAMAN MATH.ACOS() : Cegah nilai melebihi 1 atau kurang dari -1
+                            let ratioVal = pos[i * 3] / p.radius;
+                            ratioVal = Math.max(-1, Math.min(1, ratioVal));
+                            p.angle = Math.acos(ratioVal) || 0;
+                        }
+                    } else if (p.phase === 'outer_vortex') {
+                        p.angle += p.rotSpeed * speedMult;
+                        y -= p.vSpeed * speedMult;
+                        let maxR = D / 2 - 0.02;
+
+                        if (y < 0) {
+                            if (y >= -coneHeight) {
+                                const progress = Math.abs(y) / coneHeight;
+                                maxR = (D / 2 * (1 - progress)) + (B / 2 * progress) - 0.02;
+                            } else {
+                                // Jika partikel melompati batas cone dalam 1 frame, tetap pakai radius outlet bawah.
+                                maxR = B / 2 - 0.02;
+                            }
+                        }
+                        maxR = Math.max(0.001, maxR);
+
+                        if (isHeavy) {
+                            p.radius += (maxR - p.radius) * Math.min(1, 0.2 * speedMult);
+                            // Hard clamp supaya radius tidak pernah menembus dinding.
+                            p.radius = Math.min(Math.max(0.001, p.radius), maxR);
+                            if (y < -coneHeight + 0.1) p.phase = 'dust_drop';
+                        } else {
+                            const targetOuterR = Math.max(0.001, maxR * 0.8);
+                            p.radius += (targetOuterR - p.radius) * Math.min(1, 0.1 * speedMult);
+                            p.radius = Math.min(Math.max(0.001, p.radius), Math.max(0.001, maxR - 0.02));
+                            const turnaround = -(coneHeight * 0.5) - (Math.random() * (coneHeight * 0.4));
+                            if (y < turnaround) {
+                                p.phase = 'inner_vortex';
+                                p.vSpeed = Math.abs(p.vSpeed) * 1.5;
+                                p.rotSpeed *= 2;
+                            }
+                        }
+
+                        pos[i * 3] = p.radius * Math.cos(p.angle);
+                        pos[i * 3 + 1] = y;
+                        pos[i * 3 + 2] = p.radius * Math.sin(p.angle);
+
+                    } else if (p.phase === 'dust_drop' && isHeavy) {
+                        y -= (p.vSpeed * 2) * speedMult;
+                        p.angle += p.rotSpeed * 0.5 * speedMult;
+
+                        // Transisi radius lebih halus saat masuk pipa bawah.
+                        const targetDustR = Math.max(0.001, B / 2 - 0.02);
+                        p.radius += (targetDustR - p.radius) * Math.min(1, 0.3 * speedMult);
+                        p.radius = Math.min(Math.max(0.001, p.radius), targetDustR);
+
+                        pos[i * 3] = p.radius * Math.cos(p.angle);
+                        pos[i * 3 + 1] = y;
+                        pos[i * 3 + 2] = p.radius * Math.sin(p.angle);
+                        if (y < -coneHeight - 1.0) resetParticle(i, pos, 'heavy');
+                    } else if (p.phase === 'inner_vortex' && !isHeavy) {
+                        p.angle += p.rotSpeed * speedMult;
+                        y += p.vSpeed * speedMult;
+                        const innerR = (De / 2) * 0.7 * (1 + p.randomOffset);
+                        const currentR = Math.sqrt(x * x + z * z);
+                        const newR = currentR + (innerR - currentR) * Math.min(1, 0.1 * speedMult);
+
+                        pos[i * 3] = newR * Math.cos(p.angle);
+                        pos[i * 3 + 1] = y;
+                        pos[i * 3 + 2] = newR * Math.sin(p.angle);
+                        if (y > h + 1.0) resetParticle(i, pos, 'light');
+                    }
+                }
+                pts.geometry.attributes.position.needsUpdate = true;
+            };
+
+            processParticles(particlesHeavy, heavyData, true);
+            processParticles(particlesLight, lightData, false);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const now = performance.now();
+            const perf = ensurePerformanceProfile();
+            if (now - lastFrameTime < perf.frameIntervalMs) return;
+            lastFrameTime = now;
+            controls.update();
+            updateParticlesLogic();
+            updateDebugSyncPanel();
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            if (!is3DReady || !camera || !renderer) return;
+            const container = document.getElementById('three-container');
+            const wrapper = document.querySelector('.canvas-wrapper');
+            // Penyesuaian aspek rasio ulang pada resize screen
+            if (container && wrapper) {
+                camera.aspect = wrapper.clientWidth / wrapper.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(wrapper.clientWidth, wrapper.clientHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, ensurePerformanceProfile().pixelRatioCap));
+            }
+        }
+
+        function resetCamera() {
+            if (!is3DReady || !camera || !controls) return;
+            camera.position.set(6, 2, 8);
+            controls.target.set(0, 0, 0);
+        }
+
+        async function restorePersistedData() {
+            try {
+                await loadHistory();
+                const hasSavedState = await applySavedState();
+                if (!hasSavedState) {
+                    calculatePhysics();
+                }
+            } finally {
+                suspendStatePersistence = false;
+                if (is3DReady) {
+                    calculatePhysics();
+                    updateCycloneModel();
+                    initParticles();
+                }
+                scheduleSaveAppState();
+            }
+        }
+
+        async function bootstrapApp() {
+            setupInstallPrompt();
+            setupConnectionBanner();
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 640) toggleMobileActionMenu(false);
+            });
+            window.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') toggleMobileActionMenu(false);
+            });
+            // Render UI secepat mungkin tanpa beban 3D/IndexedDB.
+            setMode('standard');
+            registerServiceWorker();
+
+            // Tugas berat dipindah ke idle agar TBT/LCP lebih baik.
+            runTaskAfterFirstPaint(() => init3D(), 2000);
+            runTaskAfterFirstPaint(() => restorePersistedData(), 2500);
+            runIdleTask(() => requestPersistentStorage(), 4000);
+        }
+
+        window.onload = bootstrapApp;
+
+    </script>
+</body>
+
+</html>

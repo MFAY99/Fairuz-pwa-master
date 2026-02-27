@@ -1,0 +1,7 @@
+{
+  "cleanUrls": false,
+  "rewrites": [
+    { "source": "/aplikasi.html", "destination": "/index.html" },
+    { "source": "/aplikasi", "destination": "/index.html" }
+  ]
+}
