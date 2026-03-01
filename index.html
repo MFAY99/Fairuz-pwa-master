@@ -19,6 +19,7 @@
     <link rel="preload" href="./vendor/three.min.js" as="script">
     <link rel="preload" href="./vendor/OrbitControls.js" as="script">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1113,15 +1114,73 @@
                     </div>
                 </div>
 
+                <!-- FLOWRATE & VELOCITY -->
+                <div
+                    class="bg-slate-100 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <h3
+                        class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-2">
+                        <svg aria-hidden="true" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg> Flowrate & Velocity
+                    </h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="input-group"><label class="input-label text-emerald-600 dark:text-emerald-400"
+                                for="phys-Flowrate">Flowrate (m³/jam)</label><input type="number" id="phys-Flowrate"
+                                value="50000" step="1000"
+                                class="custom-input font-bold text-emerald-600 dark:text-emerald-400"
+                                oninput="recalcVelocityAndTrigger()"></div>
+                        <div class="input-group"><label class="input-label" for="phys-Multiple">Multiple (Jumlah
+                                Cyclone)</label><input type="number" id="phys-Multiple" value="1" step="1" min="1"
+                                class="custom-input" oninput="recalcVelocityAndTrigger()"></div>
+                        <div class="input-group"><label class="input-label" for="phys-Ainlet">A<sub>inlet</sub> (m²) = a
+                                × b</label><input type="number" id="phys-Ainlet" value="0.125" step="0.001"
+                                class="custom-input opacity-60" disabled></div>
+                        <div class="input-group"><label class="input-label" for="phys-Vi">Kec. Inlet (m/s) —
+                                <em>dihitung</em></label><input type="number" id="phys-Vi" value="25" step="0.5"
+                                class="custom-input opacity-60" disabled></div>
+                    </div>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-2">Vi = ((Flowrate ÷ A<sub>inlet</sub>)
+                        ÷ Multiple) ÷ 3600</p>
+                </div>
+
+                <!-- INTERVAL FLOWRATE -->
+                <div
+                    class="bg-slate-100 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <h3
+                        class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-2">
+                        <svg aria-hidden="true" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                            </path>
+                        </svg> Interval Flowrate
+                    </h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="input-group"><label class="input-label" for="interval-step">Interval
+                                (m³/jam)</label><input type="number" id="interval-step" value="5000" step="1000" min="1"
+                                class="custom-input" oninput="recalcIntervalData()"></div>
+                        <div class="input-group">
+                            <label class="input-label" for="interval-mode">Mode Interval</label>
+                            <select id="interval-mode" class="custom-input" onchange="onIntervalModeChange()">
+                                <option value="count">Jumlah Interval</option>
+                                <option value="end">Nilai Akhir Flowrate</option>
+                            </select>
+                        </div>
+                        <div class="input-group col-span-2">
+                            <label class="input-label" for="interval-value" id="interval-value-label">Jumlah
+                                Interval</label>
+                            <input type="number" id="interval-value" value="10" step="1" min="1" class="custom-input"
+                                oninput="recalcIntervalData()">
+                        </div>
+                    </div>
+                </div>
+
                 <!-- FISIKA & OPERASIONAL -->
                 <div class="space-y-3">
                     <h3
                         class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 pb-1">
                         Kondisi Operasional</h3>
                     <div class="grid grid-cols-2 gap-3">
-                        <div class="input-group"><label class="input-label" for="phys-Vi">Kec. Inlet (m/s)</label><input
-                                type="number" id="phys-Vi" value="25" step="0.5" class="custom-input"
-                                oninput="triggerRecalc()"></div>
                         <div class="input-group"><label class="input-label" for="phys-T">Suhu Gas (K)</label><input
                                 type="number" id="phys-T" value="298" step="1" class="custom-input"
                                 oninput="triggerRecalc()"></div>
@@ -1181,6 +1240,29 @@
         <main class="flex-grow flex flex-col p-4 md:p-6 min-w-0 gap-4">
 
             <!-- Result Cards (Responsive Grid) -->
+            <!-- Interval & PD Method Selectors -->
+            <div class="flex flex-wrap gap-2 flex-shrink-0">
+                <div class="flex items-center gap-2 flex-1 min-w-[200px]">
+                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap"
+                        for="interval-selector">Interval:</label>
+                    <select id="interval-selector" class="custom-input py-1 px-2 text-xs flex-1"
+                        onchange="onIntervalSelect()">
+                        <option value="0">Awal</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap"
+                        for="pd-method-selector">Metode ΔP:</label>
+                    <select id="pd-method-selector" class="custom-input py-1 px-2 text-xs"
+                        onchange="onPDMethodSelect()">
+                        <option value="sl">Shepherd & Lapple</option>
+                        <option value="barth">Barth</option>
+                        <option value="stairmand">Stairmand</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Result Cards (Responsive Grid) -->
             <div class="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 flex-shrink-0">
                 <div
                     class="glass-panel p-3 md:p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 shadow-sm border-t-4 border-t-blue-500 flex flex-col justify-between">
@@ -1220,6 +1302,8 @@
                     </div>
                     <div
                         class="mt-2 text-[11px] md:text-xs text-slate-600 dark:text-slate-300 flex flex-col gap-0.5 w-full bg-slate-100 dark:bg-slate-800/50 p-1.5 rounded">
+                        <div class="flex justify-between"><span>S&L:</span> <span id="res-dp-sl"
+                                class="font-bold text-slate-700 dark:text-slate-300">0 Pa</span></div>
                         <div class="flex justify-between"><span>Barth:</span> <span id="res-dp-barth"
                                 class="font-bold text-slate-700 dark:text-slate-300">0 Pa</span></div>
                         <div class="flex justify-between"><span>Strmd:</span> <span id="res-dp-stairmand"
@@ -1236,6 +1320,34 @@
                     </div>
                     <div class="text-[11px] md:text-xs text-slate-600 dark:text-slate-300 mt-2 font-mono">Kecepatan gas
                         masuk</div>
+                </div>
+            </div>
+
+            <!-- Trend Chart: Pressure Drop vs Flowrate -->
+            <div
+                class="flex-shrink-0 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm">
+                <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+                    <h3 class="text-sm font-bold flex items-center gap-2">
+                        <svg aria-hidden="true" class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z">
+                            </path>
+                        </svg>
+                        Tren Pressure Drop vs Flowrate
+                    </h3>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-bold text-slate-500 dark:text-slate-400"
+                            for="chart-pd-unit">Unit:</label>
+                        <select id="chart-pd-unit" class="custom-input py-1 px-2 text-xs w-auto"
+                            onchange="updateTrendChart()">
+                            <option value="mmh2o">mmH₂O</option>
+                            <option value="pa">Pa</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="position:relative;height:350px;">
+                    <canvas id="trend-chart-canvas"></canvas>
                 </div>
             </div>
 
@@ -1549,6 +1661,12 @@
         let compRecords = [];
         let compAnimationFrameId = null;
 
+        // --- INTERVAL & FLOWRATE STATE ---
+        let intervalResults = []; // array of {flowrate, velocity, efficiency, d50_um, DP_SL, DP_Barth, DP_Stairmand}
+        let selectedIntervalIdx = 0;
+        let selectedPDMethod = 'sl'; // 'sl', 'barth', 'stairmand'
+        let trendChartInstance = null;
+
         const COMP_COLORS = [
             { bgLight: '#eff6ff', bgDark: 'rgba(30,58,138,0.2)', borderColor: '#3b82f6', textLight: '#2563eb', textDark: '#60a5fa', barFrom: '#3b82f6', barTo: '#60a5fa' },
             { bgLight: '#ecfdf5', bgDark: 'rgba(6,78,59,0.2)', borderColor: '#10b981', textLight: '#059669', textDark: '#34d399', barFrom: '#10b981', barTo: '#34d399' },
@@ -1559,7 +1677,8 @@
         const FORM_FIELD_IDS = [
             'product-name',
             'geom-D', 'geom-h', 'geom-a', 'geom-b', 'geom-De', 'geom-S', 'geom-H', 'geom-B',
-            'phys-Vi', 'phys-T', 'phys-RhoP', 'phys-Dp', 'phys-Mu', 'phys-K', 'std-fixed-var', 'input-FlowSpeed'
+            'phys-Vi', 'phys-T', 'phys-RhoP', 'phys-Dp', 'phys-Mu', 'phys-K', 'std-fixed-var', 'input-FlowSpeed',
+            'phys-Flowrate', 'phys-Multiple', 'interval-step', 'interval-mode', 'interval-value'
         ];
 
         const standardRatios = {
@@ -1609,6 +1728,7 @@
         function togglePDUnit() {
             pdDisplayUnit = pdDisplayUnit === 'pa' ? 'mmh2o' : 'pa';
             calculatePhysics();
+            displayIntervalResult(selectedIntervalIdx);
             scheduleSaveAppState();
         }
 
@@ -1840,6 +1960,8 @@
                     inputEl.disabled = false;
                     inputEl.classList.remove('text-blue-600', 'dark:text-blue-400', 'font-bold');
                 });
+                updateAinlet();
+                recalcVelocityFromFlowrate();
                 document.getElementById('lbl-active-std').innerText = "Manual Geometry";
                 triggerRecalc();
             }
@@ -1887,12 +2009,354 @@
                     return;
                 }
             }
+            updateAinlet();
+            recalcVelocityFromFlowrate();
             calculatePhysics();
+            recalcIntervalData();
             if (is3DReady) {
                 updateCycloneModel();
                 initParticles();
             }
             scheduleSaveAppState();
+        }
+
+        // --- 2b. FLOWRATE, VELOCITY & INTERVAL ---
+        function updateAinlet() {
+            const a = getVal('geom-a');
+            const b = getVal('geom-b');
+            const ainletEl = document.getElementById('phys-Ainlet');
+            if (ainletEl) ainletEl.value = (a * b).toFixed(6);
+        }
+
+        function recalcVelocityFromFlowrate() {
+            const flowrate = parseFloat(document.getElementById('phys-Flowrate').value) || 0;
+            const ainlet = parseFloat(document.getElementById('phys-Ainlet').value) || 0.001;
+            const multiple = Math.max(1, parseInt(document.getElementById('phys-Multiple').value) || 1);
+            const vi = ((flowrate / ainlet) / multiple) / 3600;
+            const viEl = document.getElementById('phys-Vi');
+            if (viEl) viEl.value = vi.toFixed(4);
+        }
+
+        function recalcVelocityAndTrigger() {
+            updateAinlet();
+            recalcVelocityFromFlowrate();
+            calculatePhysics();
+            recalcIntervalData();
+            if (is3DReady) {
+                updateCycloneModel();
+                initParticles();
+            }
+            scheduleSaveAppState();
+        }
+
+        function onIntervalModeChange() {
+            const mode = document.getElementById('interval-mode').value;
+            const label = document.getElementById('interval-value-label');
+            const input = document.getElementById('interval-value');
+            if (mode === 'count') {
+                if (label) label.textContent = 'Jumlah Interval';
+                if (input) { input.value = '10'; input.step = '1'; input.min = '1'; }
+            } else {
+                if (label) label.textContent = 'Nilai Akhir Flowrate (m\u00b3/jam)';
+                if (input) { input.value = '100000'; input.step = '1000'; input.min = '1'; }
+            }
+            recalcIntervalData();
+        }
+
+        function calculatePhysicsForVi(Vi, geom, phys) {
+            const { D, a, b, De, S, h_cyl, H, B } = geom;
+            const { rho_p, dp_um, mu_x10, K, T } = phys;
+            const mu = mu_x10 * 1e-5;
+            const rho_air = 1.293 * (273 / Math.max(T, 1));
+            const dp = dp_um * 1e-6;
+            const n = 0.7;
+            const Q = Vi * a * b;
+
+            const Ne = (1 / Math.max(a, 0.0001)) * (h_cyl + Math.max(0.001, H - h_cyl) / 2);
+            const d50_m = Math.sqrt((9 * mu * b) / Math.max(0.0000001, (2 * Math.PI * Ne * Vi * Math.max(0.0001, (rho_p - rho_air)))));
+            const d50_um_val = d50_m * 1e6;
+
+            const l = 2.3 * De * Math.pow((D * D) / Math.max(0.0001, (a * b)), 1 / 3);
+            const d_cone = D - (D - B) * ((S + l - h_cyl) / Math.max(0.001, H - h_cyl));
+            const C = ((Math.PI * D * D) / Math.max(0.0001, (a * b))) * (
+                2 * (1 - Math.pow(De / D, 2)) * (S / D - a / (2 * D)) +
+                (1 / 3) * ((S + l - h_cyl) / D) * (1 + d_cone / D + Math.pow(d_cone / D, 2)) +
+                h_cyl / D - Math.pow(De / D, 2) * (l / D) - S / D
+            );
+
+            const CP = Math.pow(Math.max(0.0000001, (C * D * D / Math.max(0.0001, (a * b))) * (Q / Math.max(0.0001, Math.pow(D, 3))) * (n + 1)), 1 / (2 * n + 2));
+            const SP = Math.pow(Math.max(0.0000001, (rho_p * dp * dp) / Math.max(0.0000001, (18 * mu))), 1 / (2 * n + 2));
+            const efficiency = Math.max(0, Math.min(100, (1 - Math.exp(-2 * CP * SP)) * 100));
+
+            const Pdyn = 0.5 * rho_air * Vi * Vi;
+
+            const DH_SL = K * (a * b) / Math.max(0.0001, (De * De));
+            const DP_SL = DH_SL * Pdyn;
+
+            const alpha = 1 - 1.2 * (b / Math.max(0.0001, D));
+            const lambda = 0.02;
+            const ratio_barth = ((De / 2) * (Math.max(0.001, D - b)) * Math.PI) / ((2 * a * b * alpha) + ((H - S) * Math.max(0.001, D - b) * Math.PI * lambda));
+            const denominator_barth = Math.max(0.0001, 1 - ratio_barth * (H - S) * (2 / Math.max(De, 0.0001)) * lambda);
+            const epsilon_e = (De / D) * ((1 / Math.pow(denominator_barth, 2)) - 1);
+            const epsilon_i = (4.4 / Math.pow(Math.max(ratio_barth, 0.0001), 2 / 3)) + 1;
+            const DH_Barth = Math.pow(ratio_barth, 2) * Math.pow((4 * a * b) / Math.max(0.0001, (Math.PI * De * De)), 2) * (epsilon_e + epsilon_i);
+            const DP_Barth = DH_Barth * Pdyn;
+
+            const Area = (Math.PI / 4) * (D * D - De * De) +
+                Math.PI * D * h_cyl +
+                Math.PI * De * S +
+                (Math.PI / 2) * (D + B) * Math.sqrt((H - h_cyl) * (H - h_cyl) + ((D - B) / 2) * ((D - B) / 2));
+            const G_factor = 0.005;
+            const term1_stairmand = Math.sqrt(De / (2 * Math.max(0.001, D - b)));
+            const term2_stairmand = Math.sqrt((De / (2 * Math.max(0.001, D - b))) + (4 * G_factor * Area) / Math.max(0.0001, (a * b)));
+            const denominator_phi = Math.max(0.0001, (2 * G_factor * Area) / Math.max(0.0001, (a * b)));
+            const phi = (-term1_stairmand + term2_stairmand) / denominator_phi;
+            const DH_Stairmand = 1 + 2 * phi * phi * ((2 * Math.max(0.001, D - b) / Math.max(0.001, De)) - 1) + 2 * Math.pow((4 * a * b) / Math.max(0.0001, (Math.PI * De * De)), 2);
+            const DP_Stairmand = DH_Stairmand * Pdyn;
+
+            const safe = (v) => Number.isFinite(v) ? v : 0;
+            return {
+                Vi: safe(Vi), efficiency: safe(efficiency), d50_um: safe(d50_um_val),
+                DP_SL: safe(DP_SL), DP_Barth: safe(DP_Barth), DP_Stairmand: safe(DP_Stairmand),
+                // Intermediate vars for step-by-step
+                l: safe(l), C: safe(C), CP: safe(CP), SP: safe(SP), Ne: safe(Ne),
+                Pdyn: safe(Pdyn), DH_SL: safe(DH_SL),
+                alpha: safe(alpha), lambda: lambda, ratio_barth: safe(ratio_barth), DH_Barth: safe(DH_Barth),
+                Area: safe(Area), phi: safe(phi), DH_Stairmand: safe(DH_Stairmand)
+            };
+        }
+
+        function generateFlowrateArray() {
+            const flowrateStart = parseFloat(document.getElementById('phys-Flowrate').value) || 0;
+            const step = parseFloat(document.getElementById('interval-step').value) || 1;
+            const mode = document.getElementById('interval-mode').value;
+            const modeValue = parseFloat(document.getElementById('interval-value').value) || 1;
+
+            const flowrates = [flowrateStart];
+            if (step <= 0) return flowrates;
+
+            if (mode === 'count') {
+                const count = Math.max(1, Math.min(200, Math.floor(modeValue)));
+                for (let i = 1; i <= count; i++) {
+                    flowrates.push(flowrateStart + i * step);
+                }
+            } else {
+                const endFlowrate = modeValue;
+                if (endFlowrate <= flowrateStart) return flowrates;
+                let current = flowrateStart + step;
+                let safety = 0;
+                while (current <= endFlowrate && safety < 500) {
+                    flowrates.push(current);
+                    current += step;
+                    safety++;
+                }
+                if (flowrates[flowrates.length - 1] < endFlowrate) {
+                    flowrates.push(endFlowrate);
+                }
+            }
+            return flowrates;
+        }
+
+        function recalcIntervalData() {
+            const flowrates = generateFlowrateArray();
+            const ainlet = parseFloat(document.getElementById('phys-Ainlet').value) || 0.001;
+            const multiple = Math.max(1, parseInt(document.getElementById('phys-Multiple').value) || 1);
+
+            const geom = {
+                D: getVal('geom-D'), a: getVal('geom-a'), b: getVal('geom-b'),
+                De: getVal('geom-De'), S: getVal('geom-S'), h_cyl: getVal('geom-h'),
+                H: getVal('geom-H'), B: getVal('geom-B')
+            };
+            const phys = {
+                rho_p: getVal('phys-RhoP'), dp_um: getVal('phys-Dp'),
+                mu_x10: getVal('phys-Mu'), K: getVal('phys-K'), T: getVal('phys-T')
+            };
+
+            intervalResults = flowrates.map(f => {
+                const vi = ((f / ainlet) / multiple) / 3600;
+                const result = calculatePhysicsForVi(vi, geom, phys);
+                return { flowrate: f, ...result };
+            });
+
+            // Update interval selector dropdown
+            const selector = document.getElementById('interval-selector');
+            if (selector) {
+                const prevIdx = selectedIntervalIdx;
+                selector.innerHTML = intervalResults.map((r, i) => {
+                    const fLabel = r.flowrate.toLocaleString('id-ID');
+                    return `<option value="${i}">#${i}: Flowrate = ${fLabel} m\u00b3/jam, Vi = ${r.Vi.toFixed(2)} m/s</option>`;
+                }).join('');
+                if (prevIdx >= 0 && prevIdx < intervalResults.length) {
+                    selector.value = String(prevIdx);
+                    selectedIntervalIdx = prevIdx;
+                } else {
+                    selectedIntervalIdx = 0;
+                    selector.value = '0';
+                }
+            }
+
+            displayIntervalResult(selectedIntervalIdx);
+            updateTrendChart();
+        }
+
+        function onIntervalSelect() {
+            const selector = document.getElementById('interval-selector');
+            selectedIntervalIdx = parseInt(selector.value) || 0;
+            displayIntervalResult(selectedIntervalIdx);
+        }
+
+        function onPDMethodSelect() {
+            const selector = document.getElementById('pd-method-selector');
+            selectedPDMethod = selector.value || 'sl';
+            displayIntervalResult(selectedIntervalIdx);
+        }
+
+        function displayIntervalResult(idx) {
+            if (!intervalResults || idx < 0 || idx >= intervalResults.length) return;
+            const r = intervalResults[idx];
+
+            document.getElementById('res-vi').innerText = r.Vi.toFixed(1) + ' m/s';
+            document.getElementById('res-d50').innerText = r.d50_um.toFixed(2) + ' \u03bcm';
+            document.getElementById('res-eff').innerText = r.efficiency.toFixed(1) + '%';
+
+            // Display PD based on selected method
+            let mainDP = r.DP_SL;
+            if (selectedPDMethod === 'barth') mainDP = r.DP_Barth;
+            else if (selectedPDMethod === 'stairmand') mainDP = r.DP_Stairmand;
+            document.getElementById('res-dp').innerText = formatPD(mainDP);
+
+            const slEl = document.getElementById('res-dp-sl');
+            if (slEl) slEl.innerText = formatPD(r.DP_SL);
+            const barthEl = document.getElementById('res-dp-barth');
+            if (barthEl) barthEl.innerText = formatPD(r.DP_Barth);
+            const stairmandEl = document.getElementById('res-dp-stairmand');
+            if (stairmandEl) stairmandEl.innerText = formatPD(r.DP_Stairmand);
+
+            // Update lastCalcResults for history saving
+            lastCalcResults = {
+                DP_SL: r.DP_SL, DP_Barth: r.DP_Barth, DP_Stairmand: r.DP_Stairmand,
+                efficiency: r.efficiency, efficiency_raw: r.efficiency,
+                d50_um: r.d50_um, Vi: r.Vi
+            };
+
+            // Update step-by-step calculation detail
+            const stepsContainer = document.getElementById('calc-steps-panel');
+            if (stepsContainer) {
+                stepsContainer.innerHTML = generateStepByStepHTML(r);
+            }
+        }
+
+        function updateTrendChart() {
+            if (!intervalResults || intervalResults.length < 2) {
+                if (trendChartInstance) { trendChartInstance.destroy(); trendChartInstance = null; }
+                return;
+            }
+            if (typeof Chart === 'undefined') return;
+
+            const chartUnit = (document.getElementById('chart-pd-unit') || {}).value || 'mmh2o';
+            const unitLabel = chartUnit === 'mmh2o' ? 'mmH\u2082O' : 'Pa';
+            const convertPDVal = (pa) => chartUnit === 'mmh2o' ? pa / 9.806 : pa;
+
+            const labels = intervalResults.map(r => r.flowrate);
+            const dataSL = intervalResults.map(r => convertPDVal(r.DP_SL));
+            const dataBarth = intervalResults.map(r => convertPDVal(r.DP_Barth));
+            const dataStairmand = intervalResults.map(r => convertPDVal(r.DP_Stairmand));
+
+            const dark = isDarkMode();
+            const gridColor = dark ? 'rgba(148,163,184,0.15)' : 'rgba(100,116,139,0.12)';
+            const tickColor = dark ? '#94a3b8' : '#64748b';
+
+            const canvas = document.getElementById('trend-chart-canvas');
+            if (!canvas) return;
+
+            if (trendChartInstance) { trendChartInstance.destroy(); trendChartInstance = null; }
+
+            trendChartInstance = new Chart(canvas, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Shepherd & Lapple',
+                            data: dataSL,
+                            borderColor: '#f97316',
+                            backgroundColor: 'rgba(249,115,22,0.1)',
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#f97316',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 1,
+                            tension: 0.3,
+                            fill: false
+                        },
+                        {
+                            label: 'Barth',
+                            data: dataBarth,
+                            borderColor: '#a855f7',
+                            backgroundColor: 'rgba(168,85,247,0.1)',
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#a855f7',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 1,
+                            tension: 0.3,
+                            fill: false
+                        },
+                        {
+                            label: 'Stairmand',
+                            data: dataStairmand,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16,185,129,0.1)',
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#10b981',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 1,
+                            tension: 0.3,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { color: tickColor, font: { size: 11, weight: 'bold' }, usePointStyle: true, pointStyle: 'circle' }
+                        },
+                        tooltip: {
+                            backgroundColor: dark ? 'rgba(15,23,42,0.95)' : 'rgba(255,255,255,0.95)',
+                            titleColor: dark ? '#e2e8f0' : '#1e293b',
+                            bodyColor: dark ? '#cbd5e1' : '#334155',
+                            borderColor: dark ? '#334155' : '#e2e8f0',
+                            borderWidth: 1,
+                            padding: 10,
+                            callbacks: {
+                                title: (items) => `Flowrate: ${Number(items[0].label).toLocaleString('id-ID')} m\u00b3/jam`,
+                                label: (item) => `${item.dataset.label}: ${item.parsed.y.toFixed(2)} ${unitLabel}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Flowrate (m\u00b3/jam)', color: tickColor, font: { size: 12, weight: 'bold' } },
+                            ticks: {
+                                color: tickColor, font: { size: 10 },
+                                callback: function (value) { return Number(this.getLabelForValue(value)).toLocaleString('id-ID'); }
+                            },
+                            grid: { color: gridColor }
+                        },
+                        y: {
+                            title: { display: true, text: `Pressure Drop (${unitLabel})`, color: tickColor, font: { size: 12, weight: 'bold' } },
+                            ticks: { color: tickColor, font: { size: 10 }, callback: (v) => v.toFixed(1) },
+                            grid: { color: gridColor },
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
         }
 
         // --- 3. PHYSICS & MATH ---
@@ -2058,6 +2522,8 @@
             document.getElementById('res-eff').innerText = efficiencySafe.toFixed(1) + "%";
             document.getElementById('res-dp').innerText = formatPD(dpSlSafe);
 
+            const slEl = document.getElementById('res-dp-sl');
+            if (slEl) slEl.innerText = formatPD(dpSlSafe);
             const barthEl = document.getElementById('res-dp-barth');
             if (barthEl) barthEl.innerText = formatPD(dpBarthSafe);
             const stairmandEl = document.getElementById('res-dp-stairmand');
@@ -3900,6 +4366,9 @@
                     updateCycloneModel();
                     initParticles();
                 }
+                updateAinlet();
+                recalcVelocityFromFlowrate();
+                recalcIntervalData();
                 scheduleSaveAppState();
             }
         }
@@ -3914,6 +4383,8 @@
                 if (event.key === 'Escape') toggleMobileActionMenu(false);
             });
             // Render UI secepat mungkin tanpa beban 3D/IndexedDB.
+            updateAinlet();
+            recalcVelocityFromFlowrate();
             setMode('standard');
             registerServiceWorker();
 
