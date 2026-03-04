@@ -87,6 +87,10 @@
             color: #cbd5e1;
         }
 
+        .sym {
+            text-transform: none;
+        }
+
         .custom-input {
             width: 100%;
             padding: 0.5rem;
@@ -1056,11 +1060,11 @@
                             <option value="D">Diameter Siklon D (m)</option>
                             <option value="a">Tinggi Inlet a (m)</option>
                             <option value="b">Lebar Inlet b (m)</option>
-                            <option value="De">Diameter Outlet Gas De (m)</option>
-                            <option value="S">Panjang Pipa Outlet S (m)</option>
+                            <option value="De">Dia. Gas Out De (m)</option>
+                            <option value="S">Panjang Pipa Vortex S (m)</option>
                             <option value="h">Tinggi Total Silinder h (m)</option>
                             <option value="H">Tinggi Total Siklon H (m)</option>
-                            <option value="B">Diameter Outlet Dust B (m)</option>
+                            <option value="B">Dia. Dust Out B (m)</option>
                         </select>
                         <p class="text-[11px] text-slate-600 dark:text-slate-300 mt-1">Variabel lain akan dihitung
                             otomatis berdasarkan rasio standar yang dipilih.</p>
@@ -1084,33 +1088,33 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4">
                             </path>
-                        </svg> Geometri (m)
+                        </svg> Geometri <span class="sym">(m)</span>
                     </h3>
                     <div class="grid grid-cols-2 gap-3">
-                        <div class="input-group"><label class="input-label" for="geom-D">Dia. Siklon (D)</label><input
-                                type="number" id="geom-D" value="1.0" step="0.1" class="custom-input"
-                                oninput="triggerRecalc()"></div>
-                        <div class="input-group"><label class="input-label" for="geom-h">Tinggi Silinder
-                                (h)</label><input type="number" id="geom-h" value="2.0" step="0.1" class="custom-input"
-                                oninput="triggerRecalc()"></div>
-                        <div class="input-group"><label class="input-label" for="geom-a">Tinggi Inlet (a)</label><input
-                                type="number" id="geom-a" value="0.5" step="0.05" class="custom-input"
-                                oninput="triggerRecalc()"></div>
-                        <div class="input-group"><label class="input-label" for="geom-b">Lebar Inlet (b)</label><input
-                                type="number" id="geom-b" value="0.25" step="0.05" class="custom-input"
-                                oninput="triggerRecalc()"></div>
-                        <div class="input-group"><label class="input-label" for="geom-De">Dia. Gas Out
-                                (De)</label><input type="number" id="geom-De" value="0.5" step="0.1"
-                                class="custom-input" oninput="triggerRecalc()"></div>
-                        <div class="input-group"><label class="input-label" for="geom-S">Pipa Vortex (S)</label><input
-                                type="number" id="geom-S" value="0.625" step="0.05" class="custom-input"
-                                oninput="triggerRecalc()"></div>
-                        <div class="input-group"><label class="input-label" for="geom-H">Tinggi Total (H)</label><input
-                                type="number" id="geom-H" value="4.0" step="0.1" class="custom-input"
-                                oninput="triggerRecalc()"></div>
-                        <div class="input-group"><label class="input-label" for="geom-B">Dia. Dust Out (B)</label><input
-                                type="number" id="geom-B" value="0.25" step="0.05" class="custom-input"
-                                oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="geom-D">Dia. Siklon <span
+                                    class="sym">(D)</span></label><input type="number" id="geom-D" value="1.0"
+                                step="0.1" class="custom-input" oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="geom-h">Tinggi Total Silinder <span
+                                    class="sym">(h)</span></label><input type="number" id="geom-h" value="2.0"
+                                step="0.1" class="custom-input" oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="geom-a">Tinggi Inlet <span
+                                    class="sym">(a)</span></label><input type="number" id="geom-a" value="0.5"
+                                step="0.05" class="custom-input" oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="geom-b">Lebar Inlet <span
+                                    class="sym">(b)</span></label><input type="number" id="geom-b" value="0.25"
+                                step="0.05" class="custom-input" oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="geom-De">Dia. Gas Out <span
+                                    class="sym">(De)</span></label><input type="number" id="geom-De" value="0.5"
+                                step="0.1" class="custom-input" oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="geom-S">Panjang Pipa Vortex <span
+                                    class="sym">(S)</span></label><input type="number" id="geom-S" value="0.625"
+                                step="0.05" class="custom-input" oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="geom-H">Tinggi Total Siklon <span
+                                    class="sym">(H)</span></label><input type="number" id="geom-H" value="4.0"
+                                step="0.1" class="custom-input" oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="geom-B">Dia. Dust Out <span
+                                    class="sym">(B)</span></label><input type="number" id="geom-B" value="0.25"
+                                step="0.05" class="custom-input" oninput="triggerRecalc()"></div>
                     </div>
                 </div>
 
@@ -1126,19 +1130,19 @@
                     </h3>
                     <div class="grid grid-cols-2 gap-3">
                         <div class="input-group"><label class="input-label text-emerald-600 dark:text-emerald-400"
-                                for="phys-Flowrate">Flowrate (m³/jam)</label><input type="number" id="phys-Flowrate"
-                                value="50000" step="1000"
+                                for="phys-Flowrate">Flowrate <span class="sym">(m³/jam)</span></label><input
+                                type="number" id="phys-Flowrate" value="50000" step="1000"
                                 class="custom-input font-bold text-emerald-600 dark:text-emerald-400"
                                 oninput="recalcVelocityAndTrigger()"></div>
                         <div class="input-group"><label class="input-label" for="phys-Multiple">Multiple (Jumlah
                                 Cyclone)</label><input type="number" id="phys-Multiple" value="1" step="1" min="1"
                                 class="custom-input" oninput="recalcVelocityAndTrigger()"></div>
-                        <div class="input-group"><label class="input-label" for="phys-Ainlet">A<sub>inlet</sub> (m²) = a
-                                × b</label><input type="number" id="phys-Ainlet" value="0.125" step="0.001"
-                                class="custom-input opacity-60" disabled></div>
-                        <div class="input-group"><label class="input-label" for="phys-Vi">Kec. Inlet (m/s) —
-                                <em>dihitung</em></label><input type="number" id="phys-Vi" value="25" step="0.5"
-                                class="custom-input opacity-60" disabled></div>
+                        <div class="input-group"><label class="input-label" for="phys-Ainlet">A<sub>inlet</sub> <span
+                                    class="sym">(m²)</span></label><input type="number" id="phys-Ainlet" value="0.125"
+                                step="0.001" class="custom-input opacity-60" disabled></div>
+                        <div class="input-group"><label class="input-label" for="phys-Vi">Kec. Inlet <span
+                                    class="sym">(m/s)</span></label><input type="number" id="phys-Vi" value="25"
+                                step="0.5" class="custom-input opacity-60" disabled></div>
                     </div>
                     <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-2">Vi = ((Flowrate ÷ A<sub>inlet</sub>)
                         ÷ Multiple) ÷ 3600</p>
@@ -1156,9 +1160,10 @@
                         </svg> Interval Flowrate
                     </h3>
                     <div class="grid grid-cols-2 gap-3">
-                        <div class="input-group"><label class="input-label" for="interval-step">Interval
-                                (m³/jam)</label><input type="number" id="interval-step" value="5000" step="1000" min="1"
-                                class="custom-input" oninput="recalcIntervalData()"></div>
+                        <div class="input-group"><label class="input-label" for="interval-step">Interval <span
+                                    class="sym">(m³/jam)</span></label><input type="number" id="interval-step"
+                                value="5000" step="1000" min="1" class="custom-input" oninput="recalcIntervalData()">
+                        </div>
                         <div class="input-group">
                             <label class="input-label" for="interval-mode">Mode Interval</label>
                             <select id="interval-mode" class="custom-input" onchange="onIntervalModeChange()">
@@ -1181,21 +1186,21 @@
                         class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 pb-1">
                         Kondisi Operasional</h3>
                     <div class="grid grid-cols-2 gap-3">
-                        <div class="input-group"><label class="input-label" for="phys-T">Suhu Gas (K)</label><input
-                                type="number" id="phys-T" value="298" step="1" class="custom-input"
-                                oninput="triggerRecalc()"></div>
-                        <div class="input-group"><label class="input-label" for="phys-RhoP">Rho Partikel
-                                (kg/m³)</label><input type="number" id="phys-RhoP" value="2000" step="50"
+                        <div class="input-group"><label class="input-label" for="phys-T">Suhu Gas <span
+                                    class="sym">(K)</span></label><input type="number" id="phys-T" value="298" step="1"
                                 class="custom-input" oninput="triggerRecalc()"></div>
-                        <div class="input-group"><label class="input-label" for="phys-Dp">Dia. Partikel
-                                (µm)</label><input type="number" id="phys-Dp" value="10" step="1"
+                        <div class="input-group"><label class="input-label" for="phys-RhoP">Rho Partikel <span
+                                    class="sym">(kg/m³)</span></label><input type="number" id="phys-RhoP" value="2000"
+                                step="50" class="custom-input" oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="phys-Dp">Dia. Partikel <span
+                                    class="sym">(µm)</span></label><input type="number" id="phys-Dp" value="10" step="1"
                                 class="custom-input text-emerald-600 dark:text-emerald-400 font-bold"
                                 oninput="triggerRecalc()"></div>
-                        <div class="input-group"><label class="input-label" for="phys-Mu">Viskositas Gas (µG ×
-                                10⁻⁵)</label><input type="number" id="phys-Mu" value="1.81" step="0.01"
-                                class="custom-input" oninput="triggerRecalc()"></div>
+                        <div class="input-group"><label class="input-label" for="phys-Mu">Viskositas Gas <span
+                                    class="sym">(µG × 10⁻⁵)</span></label><input type="number" id="phys-Mu" value="1.81"
+                                step="0.01" class="custom-input" oninput="triggerRecalc()"></div>
                         <div class="input-group">
-                            <label class="input-label" for="phys-K">Konstanta Inlet (K)</label>
+                            <label class="input-label" for="phys-K">Konstanta Inlet <span class="sym">(K)</span></label>
                             <select id="phys-K" class="custom-input" onchange="triggerRecalc()">
                                 <option value="16">16 (S&L Default)</option>
                                 <option value="7.5">7.5 (Alternative)</option>
