@@ -906,6 +906,315 @@
         html.dark .history-row-btn-delete:hover {
             background: rgba(127, 29, 29, 0.55);
         }
+
+        /* === HISTORY KESELURUHAN OVERLAY === */
+        .hk-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            display: none;
+            flex-direction: column;
+            background: #f8fafc;
+        }
+
+        .hk-overlay.is-open {
+            display: flex;
+        }
+
+        html.dark .hk-overlay {
+            background: #020617;
+        }
+
+        .hk-header {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            background: #fff;
+        }
+
+        html.dark .hk-header {
+            background: #0f172a;
+            border-color: #1e293b;
+        }
+
+        .hk-body {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .hk-sidebar {
+            width: 300px;
+            flex-shrink: 0;
+            overflow-y: auto;
+            border-right: 1px solid #e2e8f0;
+            background: #fff;
+            padding: 1rem;
+        }
+
+        html.dark .hk-sidebar {
+            background: #0f172a;
+            border-color: #1e293b;
+        }
+
+        .hk-main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .hk-sidebar-field {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hk-sidebar-field label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            min-width: 80px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .hk-sidebar-field input[type="number"] {
+            flex: 1;
+            padding: 0.35rem 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            border: 1px solid #cbd5e1;
+            background: #f1f5f9;
+        }
+
+        html.dark .hk-sidebar-field input[type="number"] {
+            border-color: #334155;
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
+        .hk-sidebar-field input[type="number"]:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .hk-sidebar-field input[type="checkbox"] {
+            width: 1rem;
+            height: 1rem;
+            accent-color: #3b82f6;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .hk-range-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+        }
+
+        html.dark .hk-range-box {
+            background: #0f172a;
+            border-color: #1e293b;
+        }
+
+        .hk-range-field {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .hk-range-field label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .hk-range-field input {
+            width: 80px;
+            padding: 0.3rem 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            border: 1px solid #cbd5e1;
+        }
+
+        html.dark .hk-range-field input {
+            border-color: #334155;
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
+        .hk-range-field select {
+            padding: 0.3rem 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            border: 1px solid #cbd5e1;
+        }
+
+        html.dark .hk-range-field select {
+            border-color: #334155;
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
+        .hk-tabs {
+            display: flex;
+            gap: 0.25rem;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .hk-tab {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            border-radius: 0.5rem 0.5rem 0 0;
+            cursor: pointer;
+            background: #e2e8f0;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+            border-bottom: none;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        html.dark .hk-tab {
+            background: #1e293b;
+            color: #94a3b8;
+            border-color: #334155;
+        }
+
+        .hk-tab.active {
+            background: #3b82f6;
+            color: #fff;
+            border-color: #3b82f6;
+        }
+
+        html.dark .hk-tab.active {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+
+        .hk-table-wrap {
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 0 0.75rem 0.75rem 0.75rem;
+            background: #fff;
+        }
+
+        html.dark .hk-table-wrap {
+            border-color: #1e293b;
+            background: #0f172a;
+        }
+
+        .hk-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.7rem;
+            white-space: nowrap;
+        }
+
+        .hk-table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            padding: 0.4rem 0.6rem;
+            text-align: left;
+            font-weight: 800;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            background: #f1f5f9;
+            color: #475569;
+            border-bottom: 2px solid #cbd5e1;
+        }
+
+        html.dark .hk-table thead th {
+            background: #1e293b;
+            color: #94a3b8;
+            border-color: #334155;
+        }
+
+        .hk-table tbody td {
+            padding: 0.35rem 0.6rem;
+            border-bottom: 1px solid #f1f5f9;
+            font-family: 'Segoe UI', monospace;
+        }
+
+        html.dark .hk-table tbody td {
+            border-color: #1e293b;
+        }
+
+        .hk-table tbody tr:hover td {
+            background: #f8fafc;
+        }
+
+        html.dark .hk-table tbody tr:hover td {
+            background: #0f172a66;
+        }
+
+        .hk-table tbody tr.hk-existing td {
+            background: #fef3c7;
+            font-weight: 700;
+        }
+
+        html.dark .hk-table tbody tr.hk-existing td {
+            background: rgba(251, 191, 36, 0.15);
+        }
+
+        .hk-table tbody tr.hk-custom td {
+            background: #ecfdf5;
+            font-style: italic;
+        }
+
+        html.dark .hk-table tbody tr.hk-custom td {
+            background: rgba(16, 185, 129, 0.12);
+        }
+
+        .hk-highlight-eff {
+            background: rgba(59, 130, 246, 0.25) !important;
+        }
+
+        .hk-highlight-pd {
+            background: rgba(34, 197, 94, 0.25) !important;
+        }
+
+        .hk-chart-box {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            background: #fff;
+            padding: 1rem;
+        }
+
+        html.dark .hk-chart-box {
+            border-color: #1e293b;
+            background: #0f172a;
+        }
+
+        @media (max-width: 767px) {
+            .hk-body {
+                flex-direction: column;
+            }
+
+            .hk-sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+                max-height: 40vh;
+            }
+
+            html.dark .hk-sidebar {
+                border-color: #1e293b;
+            }
+        }
     </style>
 </head>
 
@@ -1237,6 +1546,17 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- SIMPAN SEMUA - History Keseluruhan -->
+                <button id="save-all-btn" onclick="saveAllToHistoryKeseluruhan()"
+                    class="w-full py-3 mt-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-colors shadow-md flex justify-center items-center gap-2">
+                    <svg aria-hidden="true" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4">
+                        </path>
+                    </svg>
+                    Simpan Semua (49 Komparasi)
+                </button>
 
             </div>
         </aside>
@@ -1620,6 +1940,102 @@
         </div>
     </div>
 
+    <!-- ========== HISTORY KESELURUHAN OVERLAY ========== -->
+    <div id="hk-overlay" class="hk-overlay">
+        <div class="hk-header">
+            <h2 class="text-base md:text-lg font-bold flex items-center gap-2">
+                📊 History Keseluruhan — Analisis Komparasi
+            </h2>
+            <div class="flex items-center gap-2">
+                <button onclick="exportHKExcel()"
+                    class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors">Export
+                    Excel</button>
+                <button onclick="closeHKOverlay()"
+                    class="p-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="hk-body">
+            <!-- SIDEBAR -->
+            <div class="hk-sidebar">
+                <h3 class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-3">🔧 Input & Tweak
+                    Geometri</h3>
+                <div id="hk-sidebar-fields"></div>
+                <button onclick="hkAddCustomRow()"
+                    class="w-full mt-3 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-colors flex justify-center items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Input Baris Baru
+                </button>
+                <div
+                    class="mt-4 p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] text-slate-500 dark:text-slate-400">
+                    <strong>Tips:</strong> Centang ☑ untuk membuka kunci variabel. Ubah nilainya, lalu klik "Input Baris
+                    Baru" untuk menambah baris custom ke tabel.
+                </div>
+            </div>
+            <!-- MAIN AREA -->
+            <div class="hk-main">
+                <!-- Range Inputs -->
+                <div class="hk-range-box">
+                    <div class="hk-range-field">
+                        <label>Efisiensi Min (%):</label>
+                        <input type="number" id="hk-eff-min" placeholder="Min" oninput="hkApplyHighlighting()">
+                    </div>
+                    <div class="hk-range-field">
+                        <label>Max (%):</label>
+                        <input type="number" id="hk-eff-max" placeholder="Max" oninput="hkApplyHighlighting()">
+                    </div>
+                    <div style="width:1px;background:#cbd5e1;margin:0 0.25rem" class="dark:bg-slate-700"></div>
+                    <div class="hk-range-field">
+                        <label>Pressure Drop Min:</label>
+                        <input type="number" id="hk-pd-min" placeholder="Min" oninput="hkApplyHighlighting()">
+                    </div>
+                    <div class="hk-range-field">
+                        <label>Max:</label>
+                        <input type="number" id="hk-pd-max" placeholder="Max" oninput="hkApplyHighlighting()">
+                    </div>
+                    <div class="hk-range-field">
+                        <label>Satuan:</label>
+                        <select id="hk-pd-unit" onchange="hkApplyHighlighting()">
+                            <option value="pa">Pa</option>
+                            <option value="mmh2o">mmH₂O</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Chart -->
+                <div class="hk-chart-box">
+                    <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+                        <h3 class="text-sm font-bold">📊 Visualisasi Komparasi</h3>
+                        <select id="hk-chart-metric" onchange="hkUpdateChart()"
+                            class="custom-input py-1 px-2 text-xs w-auto">
+                            <option value="eff">Efisiensi (%)</option>
+                            <option value="dp_sl">ΔP Shepherd & Lapple</option>
+                            <option value="dp_barth">ΔP Barth</option>
+                            <option value="dp_stairmand">ΔP Stairmand</option>
+                        </select>
+                    </div>
+                    <div style="position:relative;height:280px;"><canvas id="hk-chart-canvas"></canvas></div>
+                </div>
+                <!-- Tabs -->
+                <div class="hk-tabs" id="hk-tabs">
+                    <button class="hk-tab active" onclick="hkSwitchTab(0)">Efisiensi L&L</button>
+                    <button class="hk-tab" onclick="hkSwitchTab(1)">ΔP Shepherd & Lapple</button>
+                    <button class="hk-tab" onclick="hkSwitchTab(2)">ΔP Barth</button>
+                    <button class="hk-tab" onclick="hkSwitchTab(3)">ΔP Stairmand</button>
+                </div>
+                <!-- Tables -->
+                <div class="hk-table-wrap" style="max-height:60vh;overflow-y:auto">
+                    <div id="hk-table-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="offline-banner"
         class="hidden fixed inset-x-0 top-14 sm:top-auto sm:bottom-0 z-30 bg-amber-600 text-white text-sm font-semibold px-4 py-2 text-center shadow-lg">
         ⚡ Mode Offline - Data tetap tersimpan lokal
@@ -1694,6 +2110,24 @@
             'swift_gp': { D: 1, a: 0.5, b: 0.25, De: 0.5, S: 0.6, h: 1.75, H: 3.75, B: 0.4 },
             'swift_ht': { D: 1, a: 0.8, b: 0.35, De: 0.75, S: 0.85, h: 1.7, H: 3.7, B: 0.4 }
         };
+
+        // --- MANUAL INPUT STATE (Phase 1: State Separation) ---
+        let manualInputState = { D: 1.0, a: 0.5, b: 0.25, De: 0.5, S: 0.625, h: 2.0, H: 4.0, B: 0.25 };
+        const GEOM_KEYS = ['D', 'a', 'b', 'De', 'S', 'h', 'H', 'B'];
+
+        function saveManualGeometry() {
+            GEOM_KEYS.forEach(k => {
+                const el = document.getElementById('geom-' + k);
+                if (el) manualInputState[k] = parseFloat(el.value) || 0;
+            });
+        }
+
+        function restoreManualGeometry() {
+            GEOM_KEYS.forEach(k => {
+                const el = document.getElementById('geom-' + k);
+                if (el) el.value = manualInputState[k];
+            });
+        }
 
         // PENCEGAHAN ERROR NaN PADA THREE.JS
         // Mengamankan nilai input yang kosong atau bernilai minus agar tidak merusak geometri 3D
@@ -1943,6 +2377,11 @@
 
         // --- 2. UI LOGIC ---
         function setMode(mode) {
+            // Phase 1: Save manual geometry before switching to standard
+            if (mode === 'standard' && appMode === 'manual') {
+                saveManualGeometry();
+            }
+
             appMode = mode;
             const tabStd = document.getElementById('tab-standard');
             const tabMan = document.getElementById('tab-manual');
@@ -1957,6 +2396,9 @@
                 tabMan.className = "flex-1 py-2 text-xs md:text-sm font-bold rounded-md bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 transition-colors";
                 tabStd.className = "flex-1 py-2 text-xs md:text-sm font-bold rounded-md bg-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors";
                 secStd.style.display = 'none';
+
+                // Phase 1: Restore manual geometry
+                restoreManualGeometry();
 
                 const allVars = ['D', 'a', 'b', 'De', 'S', 'h', 'H', 'B'];
                 allVars.forEach((v) => {
@@ -4397,6 +4839,486 @@
             runTaskAfterFirstPaint(() => init3D(), 2000);
             runTaskAfterFirstPaint(() => restorePersistedData(), 2500);
             runIdleTask(() => requestPersistentStorage(), 4000);
+        }
+
+        // =====================================================================
+        // ===  HISTORY KESELURUHAN — Phases 2–7  ==============================
+        // =====================================================================
+
+        let hkData = [];          // array of row objects
+        let hkActiveTab = 0;     // 0..3
+        let hkChartInstance = null;
+
+        const HK_RATIO_KEYS = Object.keys(standardRatios);  // 6 methods
+        const HK_RATIO_LABELS = {
+            'stairmand_he': 'Stairmand High Efficiency',
+            'swift_he': 'Swift High Efficiency',
+            'lapple': 'Lapple General Purpose',
+            'swift_gp': 'Swift General Purpose',
+            'stairmand_ht': 'Stairmand High Throughput',
+            'swift_ht': 'Swift High Throughput'
+        };
+        const HK_RATIO_ORDER = ['stairmand_he', 'swift_he', 'lapple', 'swift_gp', 'stairmand_ht', 'swift_ht'];
+        const HK_VAR_GROUPS = [
+            { key: 'D', label: 'DIAMETER SIKLON' },
+            { key: 'a', label: 'TINGGI INLET' },
+            { key: 'b', label: 'LEBAR INLET' },
+            { key: 'De', label: 'OUTLET GAS' },
+            { key: 'B', label: 'OUTLET DUST' },
+            { key: 'h', label: 'TOTAL SILINDER' },
+            { key: 'H', label: 'TOTAL SIKLON' },
+            { key: 'S', label: 'PIPA OUTLET' }
+        ];
+
+        // Extended physics: returns ALL intermediate values for all 4 tables
+        function hkCalcFull(geomObj, physObj) {
+            const { D, a, b, De, S, h_cyl, H, B } = geomObj;
+            const { rho_p, dp_um, mu_x10, K, T, flowrate, multiple } = physObj;
+            const mu = mu_x10 * 1e-5;
+            const rho_gas = 1.293 * (273 / Math.max(T, 1));
+            const ainlet = a * b;
+            const Vi = ((flowrate / Math.max(ainlet, 0.0001)) / Math.max(multiple, 1)) / 3600;
+            const Q = Vi * a * b;
+            const MFR = Q * rho_gas;
+            const dp = dp_um * 1e-6;
+            const n_exp = 0.7;
+
+            const Ne = (1 / Math.max(a, 0.0001)) * (h_cyl + Math.max(0.001, H - h_cyl) / 2);
+            const d50_m = Math.sqrt((9 * mu * b) / Math.max(1e-7, (2 * Math.PI * Ne * Vi * Math.max(0.0001, (rho_p - rho_gas)))));
+            const d50_um = d50_m * 1e6;
+
+            const l = 2.3 * De * Math.pow((D * D) / Math.max(0.0001, (a * b)), 1 / 3);
+            const d_cone = D - (D - B) * ((S + l - h_cyl) / Math.max(0.001, H - h_cyl));
+            const C_geom = ((Math.PI * D * D) / Math.max(0.0001, (a * b))) * (
+                2 * (1 - Math.pow(De / D, 2)) * (S / D - a / (2 * D)) +
+                (1 / 3) * ((S + l - h_cyl) / D) * (1 + d_cone / D + Math.pow(d_cone / D, 2)) +
+                h_cyl / D - Math.pow(De / D, 2) * (l / D) - S / D
+            );
+            const CP = Math.pow(Math.max(1e-7, (C_geom * D * D / Math.max(0.0001, (a * b))) * (Q / Math.max(0.0001, Math.pow(D, 3))) * (n_exp + 1)), 1 / (2 * n_exp + 2));
+            const SP = Math.pow(Math.max(1e-7, (rho_p * dp * dp) / Math.max(1e-7, (18 * mu))), 1 / (2 * n_exp + 2));
+            const efficiency = Math.max(0, Math.min(100, (1 - Math.exp(-2 * CP * SP)) * 100));
+
+            const Pdyn = 0.5 * rho_gas * Vi * Vi;
+
+            // S&L
+            const DH_SL = K * (a * b) / Math.max(0.0001, (De * De));
+            const DP_SL = DH_SL * Pdyn;
+
+            // Barth
+            const alpha = 1 - 1.2 * (b / Math.max(0.0001, D));
+            const lambda = 0.02;
+            const ratio_barth = ((De / 2) * (Math.max(0.001, D - b)) * Math.PI) / ((2 * a * b * alpha) + ((H - S) * Math.max(0.001, D - b) * Math.PI * lambda));
+            const denom_barth = Math.max(0.0001, 1 - ratio_barth * (H - S) * (2 / Math.max(De, 0.0001)) * lambda);
+            const epsilon_e = (De / D) * ((1 / Math.pow(denom_barth, 2)) - 1);
+            const epsilon_i = (4.4 / Math.pow(Math.max(ratio_barth, 0.0001), 2 / 3)) + 1;
+            const DH_Barth = Math.pow(ratio_barth, 2) * Math.pow((4 * a * b) / Math.max(0.0001, (Math.PI * De * De)), 2) * (epsilon_e + epsilon_i);
+            const DP_Barth = DH_Barth * Pdyn;
+
+            // Stairmand
+            const Area = (Math.PI / 4) * (D * D - De * De) + Math.PI * D * h_cyl + Math.PI * De * S +
+                (Math.PI / 2) * (D + B) * Math.sqrt((H - h_cyl) * (H - h_cyl) + ((D - B) / 2) * ((D - B) / 2));
+            const G_factor = 0.005;
+            const t1s = Math.sqrt(De / (2 * Math.max(0.001, D - b)));
+            const t2s = Math.sqrt((De / (2 * Math.max(0.001, D - b))) + (4 * G_factor * Area) / Math.max(0.0001, (a * b)));
+            const denom_phi = Math.max(0.0001, (2 * G_factor * Area) / Math.max(0.0001, (a * b)));
+            const phi = (-t1s + t2s) / denom_phi;
+            const DH_Stairmand = 1 + 2 * phi * phi * ((2 * Math.max(0.001, D - b) / Math.max(0.001, De)) - 1) + 2 * Math.pow((4 * a * b) / Math.max(0.0001, (Math.PI * De * De)), 2);
+            const DP_Stairmand = DH_Stairmand * Pdyn;
+
+            const s = v => Number.isFinite(v) ? v : 0;
+            return {
+                D: s(D), a: s(a), b: s(b), De: s(De), S: s(S), h_cyl: s(h_cyl), H: s(H), B: s(B),
+                Vi: s(Vi), Q: s(Q), MFR: s(MFR), T: s(T), rho_p: s(rho_p), rho_gas: s(rho_gas),
+                mu: s(mu), mu_x10: s(mu_x10), dp_um: s(dp_um), K: s(K), Pdyn: s(Pdyn),
+                n_exp: n_exp, l: s(l), d_cone: s(d_cone), C_geom: s(C_geom), CP: s(CP), SP: s(SP),
+                efficiency: s(efficiency), d50_um: s(d50_um),
+                DH_SL: s(DH_SL), DP_SL: s(DP_SL),
+                alpha: s(alpha), lambda: lambda, ratio_barth: s(ratio_barth),
+                epsilon_e: s(epsilon_e), epsilon_i: s(epsilon_i), DH_Barth: s(DH_Barth), DP_Barth: s(DP_Barth),
+                Area: s(Area), G_factor: G_factor, phi: s(phi), DH_Stairmand: s(DH_Stairmand), DP_Stairmand: s(DP_Stairmand),
+                flowrate: s(flowrate), multiple: s(multiple)
+            };
+        }
+
+        // Phase 2: Generate 49 rows
+        function saveAllToHistoryKeseluruhan() {
+            // Collect EXISTING baseline from current form
+            const existingGeom = {
+                D: getVal('geom-D'), a: getVal('geom-a'), b: getVal('geom-b'),
+                De: getVal('geom-De'), S: getVal('geom-S'), h_cyl: getVal('geom-h'),
+                H: getVal('geom-H'), B: getVal('geom-B')
+            };
+            const existingPhys = {
+                rho_p: getVal('phys-RhoP'), dp_um: getVal('phys-Dp'),
+                mu_x10: getVal('phys-Mu'), K: getVal('phys-K'), T: getVal('phys-T'),
+                flowrate: parseFloat(document.getElementById('phys-Flowrate').value) || 0,
+                multiple: Math.max(1, parseInt(document.getElementById('phys-Multiple').value) || 1)
+            };
+
+            hkData = [];
+
+            // Row 1: EXISTING
+            const existingCalc = hkCalcFull(existingGeom, existingPhys);
+            hkData.push({ varLabel: 'EXISTING', methodLabel: 'Manual Input', type: 'existing', ...existingCalc });
+
+            // Rows 2-49: 8 variable groups × 6 ratio methods
+            HK_VAR_GROUPS.forEach(varGroup => {
+                HK_RATIO_ORDER.forEach(ratioKey => {
+                    const ratios = standardRatios[ratioKey];
+                    // Compute target variable value from ratio
+                    const geomMod = { ...existingGeom };
+                    const targetVal = existingGeom.D * ratios[varGroup.key];
+                    // Map key to geomMod property (h_cyl for h)
+                    if (varGroup.key === 'h') {
+                        geomMod.h_cyl = targetVal;
+                    } else {
+                        geomMod[varGroup.key] = targetVal;
+                    }
+                    const calc = hkCalcFull(geomMod, existingPhys);
+                    hkData.push({
+                        varLabel: varGroup.label,
+                        methodLabel: HK_RATIO_LABELS[ratioKey] || ratioKey,
+                        type: 'ratio',
+                        ...calc
+                    });
+                });
+            });
+
+            openHKOverlay();
+        }
+
+        // Phase 3: Open/Close overlay
+        function openHKOverlay() {
+            const overlay = document.getElementById('hk-overlay');
+            if (overlay) overlay.classList.add('is-open');
+            hkRenderSidebar();
+            hkRenderActiveTable();
+            hkApplyHighlighting();
+            hkUpdateChart();
+        }
+
+        function closeHKOverlay() {
+            const overlay = document.getElementById('hk-overlay');
+            if (overlay) overlay.classList.remove('is-open');
+            if (hkChartInstance) { hkChartInstance.destroy(); hkChartInstance = null; }
+        }
+
+        // Phase 3: Sidebar
+        function hkRenderSidebar() {
+            const container = document.getElementById('hk-sidebar-fields');
+            if (!container || hkData.length === 0) return;
+            const existing = hkData[0]; // EXISTING row
+            const fields = [
+                { key: 'D', label: 'Dia. Siklon (D)' },
+                { key: 'a', label: 'Tinggi Inlet (a)' },
+                { key: 'b', label: 'Lebar Inlet (b)' },
+                { key: 'De', label: 'Dia. Gas Out (De)' },
+                { key: 'S', label: 'Pipa Outlet (S)' },
+                { key: 'h_cyl', label: 'Total Silinder (h)' },
+                { key: 'H', label: 'Total Siklon (H)' },
+                { key: 'B', label: 'Dia. Dust Out (B)' }
+            ];
+            container.innerHTML = fields.map(f => {
+                const val = (existing[f.key] || 0).toFixed(4);
+                return `<div class="hk-sidebar-field">
+                    <input type="checkbox" id="hk-unlock-${f.key}" title="Buka kunci" onchange="hkToggleLock('${f.key}')">
+                    <label>${f.label}</label>
+                    <input type="number" id="hk-val-${f.key}" value="${val}" step="0.001" disabled>
+                </div>`;
+            }).join('');
+        }
+
+        function hkToggleLock(key) {
+            const cb = document.getElementById('hk-unlock-' + key);
+            const inp = document.getElementById('hk-val-' + key);
+            if (cb && inp) inp.disabled = !cb.checked;
+        }
+
+        // Phase 7: Add custom row from sidebar
+        function hkAddCustomRow() {
+            if (hkData.length === 0) return;
+            const existing = hkData[0];
+            const geomMod = {
+                D: parseFloat(document.getElementById('hk-val-D')?.value) || existing.D,
+                a: parseFloat(document.getElementById('hk-val-a')?.value) || existing.a,
+                b: parseFloat(document.getElementById('hk-val-b')?.value) || existing.b,
+                De: parseFloat(document.getElementById('hk-val-De')?.value) || existing.De,
+                S: parseFloat(document.getElementById('hk-val-S')?.value) || existing.S,
+                h_cyl: parseFloat(document.getElementById('hk-val-h_cyl')?.value) || existing.h_cyl,
+                H: parseFloat(document.getElementById('hk-val-H')?.value) || existing.H,
+                B: parseFloat(document.getElementById('hk-val-B')?.value) || existing.B
+            };
+            const physObj = {
+                rho_p: existing.rho_p, dp_um: existing.dp_um,
+                mu_x10: existing.mu_x10, K: existing.K, T: existing.T,
+                flowrate: existing.flowrate, multiple: existing.multiple
+            };
+            const calc = hkCalcFull(geomMod, physObj);
+            hkData.push({ varLabel: 'CUSTOM', methodLabel: 'Custom Input', type: 'custom', ...calc });
+            hkRenderActiveTable();
+            hkApplyHighlighting();
+            hkUpdateChart();
+        }
+
+        // Phase 3: Tab switching
+        function hkSwitchTab(idx) {
+            hkActiveTab = idx;
+            const tabs = document.querySelectorAll('#hk-tabs .hk-tab');
+            tabs.forEach((t, i) => {
+                t.classList.toggle('active', i === idx);
+            });
+            hkRenderActiveTable();
+            hkApplyHighlighting();
+        }
+
+        // Phase 4: Table Column Definitions
+        const HK_COLUMNS = [
+            // Tab 0: Efisiensi Leith & Licht
+            [
+                { h: 'Variabel', f: r => r.varLabel },
+                { h: 'Metode Rasio', f: r => r.methodLabel },
+                { h: 'D (m)', f: r => r.D.toFixed(4) },
+                { h: 'a (m)', f: r => r.a.toFixed(4) },
+                { h: 'b (m)', f: r => r.b.toFixed(4) },
+                { h: 'De (m)', f: r => r.De.toFixed(4) },
+                { h: 'B (m)', f: r => r.B.toFixed(4) },
+                { h: 'h (m)', f: r => r.h_cyl.toFixed(4) },
+                { h: 'H (m)', f: r => r.H.toFixed(4) },
+                { h: 'S (m)', f: r => r.S.toFixed(4) },
+                { h: 'Vi (m/s)', f: r => r.Vi.toFixed(3) },
+                { h: 'Q (m³/s)', f: r => r.Q.toFixed(6) },
+                { h: 'T (K)', f: r => r.T.toFixed(1) },
+                { h: 'ρp (kg/m³)', f: r => r.rho_p.toFixed(1) },
+                { h: 'μ (×10⁻⁵)', f: r => r.mu_x10.toFixed(2) },
+                { h: 'dp (μm)', f: r => r.dp_um.toFixed(2) },
+                { h: 'n (exp. vortex)', f: r => r.n_exp.toFixed(2) },
+                { h: 'l vortex (m)', f: r => r.l.toFixed(4) },
+                { h: 'd cone (m)', f: r => r.d_cone.toFixed(4) },
+                { h: 'C geom', f: r => r.C_geom.toFixed(4) },
+                { h: 'CP', f: r => r.CP.toFixed(6) },
+                { h: 'SP', f: r => r.SP.toFixed(6) },
+                { h: 'η (%)', f: r => r.efficiency.toFixed(2), isEff: true }
+            ],
+            // Tab 1: ΔP Shepherd & Lapple
+            [
+                { h: 'Variabel', f: r => r.varLabel },
+                { h: 'Metode Rasio', f: r => r.methodLabel },
+                { h: 'a (m)', f: r => r.a.toFixed(4) },
+                { h: 'b (m)', f: r => r.b.toFixed(4) },
+                { h: 'De (m)', f: r => r.De.toFixed(4) },
+                { h: 'T (K)', f: r => r.T.toFixed(1) },
+                { h: 'Vi (m/s)', f: r => r.Vi.toFixed(3) },
+                { h: 'MFR (kg/s)', f: r => r.MFR.toFixed(4) },
+                { h: 'ρ gas (kg/m³)', f: r => r.rho_gas.toFixed(4) },
+                { h: 'Pdyn (Pa)', f: r => r.Pdyn.toFixed(2) },
+                { h: 'K', f: r => r.K.toFixed(1) },
+                { h: 'ΔH S&L', f: r => r.DH_SL.toFixed(4) },
+                { h: 'ΔP (Pa)', f: r => r.DP_SL.toFixed(2), isPD: true },
+                { h: 'ΔP (mmH₂O)', f: r => (r.DP_SL / 9.806).toFixed(2), isPD_mm: true }
+            ],
+            // Tab 2: ΔP Barth
+            [
+                { h: 'Variabel', f: r => r.varLabel },
+                { h: 'Metode Rasio', f: r => r.methodLabel },
+                { h: 'D (m)', f: r => r.D.toFixed(4) },
+                { h: 'a (m)', f: r => r.a.toFixed(4) },
+                { h: 'b (m)', f: r => r.b.toFixed(4) },
+                { h: 'De (m)', f: r => r.De.toFixed(4) },
+                { h: 'H (m)', f: r => r.H.toFixed(4) },
+                { h: 'S (m)', f: r => r.S.toFixed(4) },
+                { h: 'MFR (kg/s)', f: r => r.MFR.toFixed(4) },
+                { h: 'T (K)', f: r => r.T.toFixed(1) },
+                { h: 'λ (gesekan)', f: r => r.lambda.toFixed(4) },
+                { h: 'ρ gas (kg/m³)', f: r => r.rho_gas.toFixed(4) },
+                { h: 'Vi (m/s)', f: r => r.Vi.toFixed(3) },
+                { h: 'Pdyn (Pa)', f: r => r.Pdyn.toFixed(2) },
+                { h: 'α koreksi', f: r => r.alpha.toFixed(4) },
+                { h: 'Ratio', f: r => r.ratio_barth.toFixed(4) },
+                { h: 'ε badan', f: r => r.epsilon_i.toFixed(4) },
+                { h: 'ε outlet', f: r => r.epsilon_e.toFixed(4) },
+                { h: 'ΔH Barth', f: r => r.DH_Barth.toFixed(4) },
+                { h: 'ΔP (Pa)', f: r => r.DP_Barth.toFixed(2), isPD: true },
+                { h: 'ΔP (mmH₂O)', f: r => (r.DP_Barth / 9.806).toFixed(2), isPD_mm: true }
+            ],
+            // Tab 3: ΔP Stairmand
+            [
+                { h: 'Variabel', f: r => r.varLabel },
+                { h: 'Metode Rasio', f: r => r.methodLabel },
+                { h: 'D (m)', f: r => r.D.toFixed(4) },
+                { h: 'a (m)', f: r => r.a.toFixed(4) },
+                { h: 'b (m)', f: r => r.b.toFixed(4) },
+                { h: 'De (m)', f: r => r.De.toFixed(4) },
+                { h: 'h (m)', f: r => r.h_cyl.toFixed(4) },
+                { h: 'H (m)', f: r => r.H.toFixed(4) },
+                { h: 'S (m)', f: r => r.S.toFixed(4) },
+                { h: 'B (m)', f: r => r.B.toFixed(4) },
+                { h: 'Vi (m/s)', f: r => r.Vi.toFixed(3) },
+                { h: 'T (K)', f: r => r.T.toFixed(1) },
+                { h: 'f (gesekan)', f: r => r.G_factor.toFixed(4) },
+                { h: 'MFR (kg/s)', f: r => r.MFR.toFixed(4) },
+                { h: 'ρ gas (kg/m³)', f: r => r.rho_gas.toFixed(4) },
+                { h: 'Pdyn (Pa)', f: r => r.Pdyn.toFixed(2) },
+                { h: 'Area (m²)', f: r => r.Area.toFixed(4) },
+                { h: 'φ', f: r => r.phi.toFixed(6) },
+                { h: 'ΔH Stairmand', f: r => r.DH_Stairmand.toFixed(4) },
+                { h: 'ΔP (Pa)', f: r => r.DP_Stairmand.toFixed(2), isPD: true },
+                { h: 'ΔP (mmH₂O)', f: r => (r.DP_Stairmand / 9.806).toFixed(2), isPD_mm: true }
+            ]
+        ];
+
+        // Phase 4: Render active table
+        function hkRenderActiveTable() {
+            const container = document.getElementById('hk-table-container');
+            if (!container || hkData.length === 0) return;
+            const cols = HK_COLUMNS[hkActiveTab];
+            let html = '<table class="hk-table"><thead><tr>';
+            cols.forEach(c => { html += `<th>${c.h}</th>`; });
+            html += '</tr></thead><tbody>';
+            hkData.forEach((row, ri) => {
+                const rowClass = row.type === 'existing' ? 'hk-existing' : (row.type === 'custom' ? 'hk-custom' : '');
+                html += `<tr class="${rowClass}" data-hk-row="${ri}">`;
+                cols.forEach((c, ci) => {
+                    let cls = '';
+                    if (c.isEff) cls = 'data-hk-eff';
+                    else if (c.isPD) cls = 'data-hk-pd-pa';
+                    else if (c.isPD_mm) cls = 'data-hk-pd-mm';
+                    html += `<td ${cls}>${c.f(row)}</td>`;
+                });
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // Phase 5: Dynamic highlighting
+        function hkApplyHighlighting() {
+            const effMin = parseFloat(document.getElementById('hk-eff-min')?.value);
+            const effMax = parseFloat(document.getElementById('hk-eff-max')?.value);
+            const pdMin = parseFloat(document.getElementById('hk-pd-min')?.value);
+            const pdMax = parseFloat(document.getElementById('hk-pd-max')?.value);
+            const pdUnit = (document.getElementById('hk-pd-unit')?.value) || 'pa';
+
+            // Efficiency highlighting (blue)
+            document.querySelectorAll('[data-hk-eff]').forEach(td => {
+                td.classList.remove('hk-highlight-eff');
+                const val = parseFloat(td.textContent);
+                if (!isNaN(effMin) && !isNaN(effMax) && !isNaN(val)) {
+                    if (val >= effMin && val <= effMax) td.classList.add('hk-highlight-eff');
+                }
+            });
+
+            // Pressure drop highlighting (green)
+            const pdAttr = pdUnit === 'mmh2o' ? 'data-hk-pd-mm' : 'data-hk-pd-pa';
+            document.querySelectorAll('[data-hk-pd-pa],[data-hk-pd-mm]').forEach(td => {
+                td.classList.remove('hk-highlight-pd');
+            });
+            document.querySelectorAll(`[${pdAttr}]`).forEach(td => {
+                const val = parseFloat(td.textContent);
+                if (!isNaN(pdMin) && !isNaN(pdMax) && !isNaN(val)) {
+                    if (val >= pdMin && val <= pdMax) td.classList.add('hk-highlight-pd');
+                }
+            });
+        }
+
+        // Phase 6: Chart
+        function hkUpdateChart() {
+            if (typeof Chart === 'undefined' || hkData.length === 0) return;
+            const canvas = document.getElementById('hk-chart-canvas');
+            if (!canvas) return;
+            if (hkChartInstance) { hkChartInstance.destroy(); hkChartInstance = null; }
+
+            const metric = (document.getElementById('hk-chart-metric')?.value) || 'eff';
+            const dark = isDarkMode();
+            const gridColor = dark ? 'rgba(148,163,184,0.15)' : 'rgba(100,116,139,0.12)';
+            const tickColor = dark ? '#94a3b8' : '#64748b';
+
+            const labels = hkData.map((r, i) => i === 0 ? 'EXISTING' : `${r.varLabel.substr(0, 8)}-${r.methodLabel.substr(0, 8)}`);
+            const getValue = (r) => {
+                if (metric === 'eff') return r.efficiency;
+                if (metric === 'dp_sl') return r.DP_SL;
+                if (metric === 'dp_barth') return r.DP_Barth;
+                if (metric === 'dp_stairmand') return r.DP_Stairmand;
+                return 0;
+            };
+            const values = hkData.map(getValue);
+            const yLabel = metric === 'eff' ? 'Efisiensi (%)' : 'Pressure Drop (Pa)';
+
+            const bgColors = hkData.map((r, i) => {
+                if (r.type === 'existing') return '#f59e0b';
+                if (r.type === 'custom') return '#10b981';
+                const groupIdx = Math.floor((i - 1) / 6) % 8;
+                const hues = [210, 30, 120, 270, 340, 170, 50, 300];
+                return `hsl(${hues[groupIdx]},70%,${dark ? '55%' : '45%'})`;
+            });
+
+            hkChartInstance = new Chart(canvas, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: yLabel,
+                        data: values,
+                        backgroundColor: bgColors,
+                        borderRadius: 3,
+                        barPercentage: 0.85
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: (items) => {
+                                    const idx = items[0].dataIndex;
+                                    const r = hkData[idx];
+                                    return `${r.varLabel} — ${r.methodLabel}`;
+                                },
+                                label: (item) => `${yLabel}: ${item.parsed.y.toFixed(2)}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: tickColor, font: { size: 8 }, maxRotation: 90, minRotation: 45 },
+                            grid: { display: false }
+                        },
+                        y: {
+                            title: { display: true, text: yLabel, color: tickColor, font: { size: 11, weight: 'bold' } },
+                            ticks: { color: tickColor, font: { size: 10 } },
+                            grid: { color: gridColor },
+                            beginAtZero: metric === 'eff'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Excel Export for HK
+        function exportHKExcel() {
+            if (typeof XLSX === 'undefined') {
+                alert('Library XLSX belum dimuat. Coba refresh halaman.');
+                return;
+            }
+            if (hkData.length === 0) {
+                alert('Tidak ada data untuk diekspor.');
+                return;
+            }
+            const wb = XLSX.utils.book_new();
+            const tabNames = ['Efisiensi L&L', 'ΔP S&L', 'ΔP Barth', 'ΔP Stairmand'];
+            HK_COLUMNS.forEach((cols, ti) => {
+                const rows = hkData.map(row => {
+                    const obj = {};
+                    cols.forEach(c => { obj[c.h] = c.f(row); });
+                    return obj;
+                });
+                const ws = XLSX.utils.json_to_sheet(rows);
+                ws['!cols'] = cols.map(c => ({ wch: Math.max(c.h.length + 2, 12) }));
+                XLSX.utils.book_append_sheet(wb, ws, tabNames[ti]);
+            });
+            const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            XLSX.writeFile(wb, `history-keseluruhan-${ts}.xlsx`);
         }
 
         window.onload = bootstrapApp;
