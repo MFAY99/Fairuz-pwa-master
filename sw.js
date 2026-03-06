@@ -1,5 +1,5 @@
-const APP_SHELL_CACHE = 'cyclone-shell-v17';
-const RUNTIME_CACHE = 'cyclone-runtime-v17';
+const APP_SHELL_CACHE = 'cyclone-shell-v18';
+const RUNTIME_CACHE = 'cyclone-runtime-v18';
 
 const STATIC_DESTINATIONS = new Set(["style", "script", "image", "font", "manifest"]);
 const STATIC_PATH_PREFIXES = ["/assets/", "/vendor/", "/icons/"];

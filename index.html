@@ -2055,6 +2055,11 @@
                                 <option value="dp_barth">ΔP Barth</option>
                                 <option value="dp_stairmand">ΔP Stairmand</option>
                             </select>
+                            <select id="hk-chart-unit" onchange="hkUpdateChart()"
+                                class="custom-input py-1 px-2 text-xs w-auto hidden">
+                                <option value="pa">Pa</option>
+                                <option value="mmh2o">mmH₂O</option>
+                            </select>
                             <button onclick="hkToggleChart()" id="hk-chart-toggle-btn"
                                 class="p-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded transition-colors"
                                 title="Minimize/Maximize">
@@ -5323,6 +5328,16 @@
             if (hkFilteredData.length === 0) return;
 
             const metric = (document.getElementById('hk-chart-metric')?.value) || 'eff';
+            const unitSelect = document.getElementById('hk-chart-unit');
+            const unit = unitSelect ? unitSelect.value : 'pa';
+
+            // Mengontrol visibilitas dari dropdown unit berdasarkan pilihan metric
+            if (metric === 'eff') {
+                if (unitSelect) unitSelect.classList.add('hidden');
+            } else {
+                if (unitSelect) unitSelect.classList.remove('hidden');
+            }
+
             const dark = isDarkMode();
             const gridColor = dark ? 'rgba(148,163,184,0.15)' : 'rgba(100,116,139,0.12)';
             const tickColor = dark ? '#94a3b8' : '#64748b';
@@ -5330,13 +5345,13 @@
             const labels = hkFilteredData.map((r, i) => r.type === 'existing' ? 'EXISTING' : `${r.varLabel.substr(0, 8)}-${r.methodLabel.substr(0, 8)}`);
             const getValue = (r) => {
                 if (metric === 'eff') return r.efficiency;
-                if (metric === 'dp_sl') return r.DP_SL;
-                if (metric === 'dp_barth') return r.DP_Barth;
-                if (metric === 'dp_stairmand') return r.DP_Stairmand;
+                if (metric === 'dp_sl') return unit === 'mmh2o' ? r.DP_SL / 9.806 : r.DP_SL;
+                if (metric === 'dp_barth') return unit === 'mmh2o' ? r.DP_Barth / 9.806 : r.DP_Barth;
+                if (metric === 'dp_stairmand') return unit === 'mmh2o' ? r.DP_Stairmand / 9.806 : r.DP_Stairmand;
                 return 0;
             };
             const values = hkFilteredData.map(getValue);
-            const yLabel = metric === 'eff' ? 'Efisiensi (%)' : 'Pressure Drop (Pa)';
+            const yLabel = metric === 'eff' ? 'Efisiensi (%)' : (unit === 'mmh2o' ? 'Pressure Drop (mmH₂O)' : 'Pressure Drop (Pa)');
 
             const bgColors = hkFilteredData.map((r, i) => {
                 if (r.type === 'existing') return '#f59e0b';
