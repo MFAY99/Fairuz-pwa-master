@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyclone Separator Pro - CFD & Design Tool</title>
+    <title>Cyclone Separator - CFD & Design Tool</title>
     <meta name="description"
-        content="Cyclone Separator Pro untuk simulasi desain cyclone separator, analisis efisiensi, dan visualisasi 3D.">
+        content="Cyclone Separator untuk simulasi desain cyclone separator, analisis efisiensi, dan visualisasi 3D.">
     <meta name="theme-color" content="#0f172a">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Cyclone Pro">
+    <meta name="apple-mobile-web-app-title" content="Cyclone Separator">
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
     <link rel="apple-touch-icon" href="./icons/icon-192.png">
@@ -915,6 +915,8 @@
             display: none;
             flex-direction: column;
             background: #f8fafc;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
         .hk-overlay.is-open {
@@ -933,6 +935,9 @@
             padding: 0.75rem 1rem;
             border-bottom: 1px solid #e2e8f0;
             background: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 20;
         }
 
         html.dark .hk-header {
@@ -943,7 +948,8 @@
         .hk-body {
             flex: 1;
             display: flex;
-            overflow: hidden;
+            align-items: flex-start;
+            min-width: 0;
         }
 
         .hk-sidebar {
@@ -953,6 +959,9 @@
             border-right: 1px solid #e2e8f0;
             background: #fff;
             padding: 1rem;
+            position: sticky;
+            top: 61px;
+            height: calc(100vh - 61px);
         }
 
         html.dark .hk-sidebar {
@@ -962,11 +971,11 @@
 
         .hk-main {
             flex: 1;
-            overflow-y: auto;
             padding: 1rem;
             display: flex;
             flex-direction: column;
             gap: 1rem;
+            min-width: 0;
         }
 
         .hk-sidebar-field {
@@ -1104,6 +1113,7 @@
         }
 
         .hk-table-wrap {
+            width: 100%;
             overflow-x: auto;
             border: 1px solid #e2e8f0;
             border-radius: 0 0.75rem 0.75rem 0.75rem;
@@ -1179,19 +1189,20 @@
             background: rgba(16, 185, 129, 0.12);
         }
 
-        .hk-highlight-eff {
-            background: rgba(59, 130, 246, 0.25) !important;
-        }
-
-        .hk-highlight-pd {
-            background: rgba(34, 197, 94, 0.25) !important;
-        }
-
         .hk-chart-box {
             border: 1px solid #e2e8f0;
             border-radius: 0.75rem;
             background: #fff;
             padding: 1rem;
+            transition: padding 0.3s ease;
+        }
+
+        .hk-chart-box.is-minimized {
+            padding-bottom: 0.5rem;
+        }
+
+        .hk-chart-box.is-minimized .hk-chart-body {
+            display: none;
         }
 
         html.dark .hk-chart-box {
@@ -1225,13 +1236,16 @@
         class="sticky top-0 z-40 w-full flex-shrink-0 flex items-center justify-between px-4 md:px-6 py-3 border-b border-slate-300 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-sm">
         <div>
             <h1 class="text-lg md:text-xl font-extrabold tracking-tight flex items-center gap-2">
-                <svg aria-hidden="true" class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
-                    </path>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"
+                    class="text-blue-600 dark:text-white" aria-hidden="true">
+                    <path d="M21 4H3C2.4 4 2 4.4 2 5S2.4 6 3 6H21C21.6 6 22 5.6 22 5S21.6 4 21 4Z" />
+                    <path
+                        d="M19.5 9H4.5C3.9 9 3.5 9.4 3.5 10S3.9 11 4.5 11H19.5C20.1 11 20.5 10.6 20.5 10S20.1 9 19.5 9Z" />
+                    <path d="M17 14H7C6.4 14 6 14.4 6 15S6.4 16 7 16H17C17.6 16 18 15.6 18 15S17.6 14 17 14Z" />
+                    <path d="M14 19H10C9.4 19 9 19.4 9 20S9.4 21 10 21H14C14.6 21 15 20.6 15 20S14.6 19 14 19Z" />
                 </svg>
-                <span class="text-blue-600 dark:text-blue-500">Cyclone</span> <span class="hidden sm:inline">Pro</span>
+                <span class="text-blue-600">Cyclone</span> <span
+                    class="hidden sm:inline text-slate-900 dark:text-white">Separator Calculator</span>
             </h1>
         </div>
         <div class="flex items-center gap-2 md:gap-3">
@@ -1944,7 +1958,12 @@
     <div id="hk-overlay" class="hk-overlay">
         <div class="hk-header">
             <h2 class="text-base md:text-lg font-bold flex items-center gap-2">
-                📊 History Keseluruhan — Analisis Komparasi
+                <svg aria-hidden="true" class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none"
+                    stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                </svg>
+                History Keseluruhan — Analisis Komparasi
             </h2>
             <div class="flex items-center gap-2">
                 <button onclick="exportHKExcel()"
@@ -1984,42 +2003,72 @@
                 <div class="hk-range-box">
                     <div class="hk-range-field">
                         <label>Efisiensi Min (%):</label>
-                        <input type="number" id="hk-eff-min" placeholder="Min" oninput="hkApplyHighlighting()">
+                        <input type="number" id="hk-eff-min" placeholder="Min" oninput="hkApplyFilter()">
                     </div>
                     <div class="hk-range-field">
                         <label>Max (%):</label>
-                        <input type="number" id="hk-eff-max" placeholder="Max" oninput="hkApplyHighlighting()">
+                        <input type="number" id="hk-eff-max" placeholder="Max" oninput="hkApplyFilter()">
                     </div>
                     <div style="width:1px;background:#cbd5e1;margin:0 0.25rem" class="dark:bg-slate-700"></div>
                     <div class="hk-range-field">
                         <label>Pressure Drop Min:</label>
-                        <input type="number" id="hk-pd-min" placeholder="Min" oninput="hkApplyHighlighting()">
+                        <input type="number" id="hk-pd-min" placeholder="Min" oninput="hkApplyFilter()">
                     </div>
                     <div class="hk-range-field">
                         <label>Max:</label>
-                        <input type="number" id="hk-pd-max" placeholder="Max" oninput="hkApplyHighlighting()">
+                        <input type="number" id="hk-pd-max" placeholder="Max" oninput="hkApplyFilter()">
                     </div>
                     <div class="hk-range-field">
                         <label>Satuan:</label>
-                        <select id="hk-pd-unit" onchange="hkApplyHighlighting()">
+                        <select id="hk-pd-unit" onchange="hkApplyFilter()">
                             <option value="pa">Pa</option>
                             <option value="mmh2o">mmH₂O</option>
                         </select>
                     </div>
+                    <!-- Reset Filter Button -->
+                    <button id="hk-reset-filter" onclick="hkResetFilter()"
+                        class="ml-auto p-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors border border-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 dark:border-red-800"
+                        title="Reset Filter">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
                 </div>
                 <!-- Chart -->
-                <div class="hk-chart-box">
+                <div class="hk-chart-box" id="hk-chart-box">
                     <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
-                        <h3 class="text-sm font-bold">📊 Visualisasi Komparasi</h3>
-                        <select id="hk-chart-metric" onchange="hkUpdateChart()"
-                            class="custom-input py-1 px-2 text-xs w-auto">
-                            <option value="eff">Efisiensi (%)</option>
-                            <option value="dp_sl">ΔP Shepherd & Lapple</option>
-                            <option value="dp_barth">ΔP Barth</option>
-                            <option value="dp_stairmand">ΔP Stairmand</option>
-                        </select>
+                        <h3 class="text-sm font-bold flex items-center gap-2">
+                            <svg aria-hidden="true" class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z">
+                                </path>
+                            </svg>
+                            Visualisasi Komparasi
+                        </h3>
+                        <div class="flex items-center gap-2">
+                            <select id="hk-chart-metric" onchange="hkUpdateChart()"
+                                class="custom-input py-1 px-2 text-xs w-auto">
+                                <option value="eff">Efisiensi (%)</option>
+                                <option value="dp_sl">ΔP Shepherd & Lapple</option>
+                                <option value="dp_barth">ΔP Barth</option>
+                                <option value="dp_stairmand">ΔP Stairmand</option>
+                            </select>
+                            <button onclick="hkToggleChart()" id="hk-chart-toggle-btn"
+                                class="p-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded transition-colors"
+                                title="Minimize/Maximize">
+                                <svg class="w-4 h-4" id="hk-chart-toggle-icon" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 15l7-7 7 7"></path>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
-                    <div style="position:relative;height:280px;"><canvas id="hk-chart-canvas"></canvas></div>
+                    <div class="hk-chart-body" id="hk-chart-body">
+                        <div style="position:relative;height:280px;"><canvas id="hk-chart-canvas"></canvas></div>
+                    </div>
                 </div>
                 <!-- Tabs -->
                 <div class="hk-tabs" id="hk-tabs">
@@ -2029,7 +2078,7 @@
                     <button class="hk-tab" onclick="hkSwitchTab(3)">ΔP Stairmand</button>
                 </div>
                 <!-- Tables -->
-                <div class="hk-table-wrap" style="max-height:60vh;overflow-y:auto">
+                <div class="hk-table-wrap">
                     <div id="hk-table-container"></div>
                 </div>
             </div>
@@ -4941,6 +4990,8 @@
         }
 
         // Phase 2: Generate 49 rows
+        let hkFilteredData = []; // State for displayed rows
+
         function saveAllToHistoryKeseluruhan() {
             // Collect EXISTING baseline from current form
             const existingGeom = {
@@ -4984,7 +5035,22 @@
                 });
             });
 
+            // Reset filter
+            document.getElementById('hk-eff-min').value = '';
+            document.getElementById('hk-eff-max').value = '';
+            document.getElementById('hk-pd-min').value = '';
+            document.getElementById('hk-pd-max').value = '';
+
             openHKOverlay();
+        }
+
+        // Phase 5: Reset Filter JS function
+        function hkResetFilter() {
+            document.getElementById('hk-eff-min').value = '';
+            document.getElementById('hk-eff-max').value = '';
+            document.getElementById('hk-pd-min').value = '';
+            document.getElementById('hk-pd-max').value = '';
+            hkApplyFilter();
         }
 
         // Phase 3: Open/Close overlay
@@ -4992,15 +5058,27 @@
             const overlay = document.getElementById('hk-overlay');
             if (overlay) overlay.classList.add('is-open');
             hkRenderSidebar();
-            hkRenderActiveTable();
-            hkApplyHighlighting();
-            hkUpdateChart();
+            // Start by applying blank filter which copies data and renders everything
+            hkApplyFilter();
         }
 
         function closeHKOverlay() {
             const overlay = document.getElementById('hk-overlay');
             if (overlay) overlay.classList.remove('is-open');
             if (hkChartInstance) { hkChartInstance.destroy(); hkChartInstance = null; }
+        }
+
+        function hkToggleChart() {
+            const chartBox = document.getElementById('hk-chart-box');
+            const icon = document.getElementById('hk-chart-toggle-icon');
+            if (chartBox && icon) {
+                chartBox.classList.toggle('is-minimized');
+                if (chartBox.classList.contains('is-minimized')) {
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>';
+                } else {
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>';
+                }
+            }
         }
 
         // Phase 3: Sidebar
@@ -5055,9 +5133,9 @@
             };
             const calc = hkCalcFull(geomMod, physObj);
             hkData.push({ varLabel: 'CUSTOM', methodLabel: 'Custom Input', type: 'custom', ...calc });
-            hkRenderActiveTable();
-            hkApplyHighlighting();
-            hkUpdateChart();
+
+            // Re-apply filter on the new full dataset
+            hkApplyFilter();
         }
 
         // Phase 3: Tab switching
@@ -5068,7 +5146,6 @@
                 t.classList.toggle('active', i === idx);
             });
             hkRenderActiveTable();
-            hkApplyHighlighting();
         }
 
         // Phase 4: Table Column Definitions
@@ -5097,7 +5174,7 @@
                 { h: 'C geom', f: r => r.C_geom.toFixed(4) },
                 { h: 'CP', f: r => r.CP.toFixed(6) },
                 { h: 'SP', f: r => r.SP.toFixed(6) },
-                { h: 'η (%)', f: r => r.efficiency.toFixed(2), isEff: true }
+                { h: 'η (%)', f: r => r.efficiency.toFixed(2) }
             ],
             // Tab 1: ΔP Shepherd & Lapple
             [
@@ -5113,8 +5190,8 @@
                 { h: 'Pdyn (Pa)', f: r => r.Pdyn.toFixed(2) },
                 { h: 'K', f: r => r.K.toFixed(1) },
                 { h: 'ΔH S&L', f: r => r.DH_SL.toFixed(4) },
-                { h: 'ΔP (Pa)', f: r => r.DP_SL.toFixed(2), isPD: true },
-                { h: 'ΔP (mmH₂O)', f: r => (r.DP_SL / 9.806).toFixed(2), isPD_mm: true }
+                { h: 'ΔP (Pa)', f: r => r.DP_SL.toFixed(2) },
+                { h: 'ΔP (mmH₂O)', f: r => (r.DP_SL / 9.806).toFixed(2) }
             ],
             // Tab 2: ΔP Barth
             [
@@ -5137,8 +5214,8 @@
                 { h: 'ε badan', f: r => r.epsilon_i.toFixed(4) },
                 { h: 'ε outlet', f: r => r.epsilon_e.toFixed(4) },
                 { h: 'ΔH Barth', f: r => r.DH_Barth.toFixed(4) },
-                { h: 'ΔP (Pa)', f: r => r.DP_Barth.toFixed(2), isPD: true },
-                { h: 'ΔP (mmH₂O)', f: r => (r.DP_Barth / 9.806).toFixed(2), isPD_mm: true }
+                { h: 'ΔP (Pa)', f: r => r.DP_Barth.toFixed(2) },
+                { h: 'ΔP (mmH₂O)', f: r => (r.DP_Barth / 9.806).toFixed(2) }
             ],
             // Tab 3: ΔP Stairmand
             [
@@ -5161,28 +5238,27 @@
                 { h: 'Area (m²)', f: r => r.Area.toFixed(4) },
                 { h: 'φ', f: r => r.phi.toFixed(6) },
                 { h: 'ΔH Stairmand', f: r => r.DH_Stairmand.toFixed(4) },
-                { h: 'ΔP (Pa)', f: r => r.DP_Stairmand.toFixed(2), isPD: true },
-                { h: 'ΔP (mmH₂O)', f: r => (r.DP_Stairmand / 9.806).toFixed(2), isPD_mm: true }
+                { h: 'ΔP (Pa)', f: r => r.DP_Stairmand.toFixed(2) },
+                { h: 'ΔP (mmH₂O)', f: r => (r.DP_Stairmand / 9.806).toFixed(2) }
             ]
         ];
 
         // Phase 4: Render active table
         function hkRenderActiveTable() {
             const container = document.getElementById('hk-table-container');
-            if (!container || hkData.length === 0) return;
+            if (!container || hkFilteredData.length === 0) {
+                if (container) container.innerHTML = '<div class="p-4 text-center text-slate-500">Tidak ada data yang sesuai filter.</div>';
+                return;
+            }
             const cols = HK_COLUMNS[hkActiveTab];
             let html = '<table class="hk-table"><thead><tr>';
             cols.forEach(c => { html += `<th>${c.h}</th>`; });
             html += '</tr></thead><tbody>';
-            hkData.forEach((row, ri) => {
+            hkFilteredData.forEach((row, ri) => {
                 const rowClass = row.type === 'existing' ? 'hk-existing' : (row.type === 'custom' ? 'hk-custom' : '');
                 html += `<tr class="${rowClass}" data-hk-row="${ri}">`;
-                cols.forEach((c, ci) => {
-                    let cls = '';
-                    if (c.isEff) cls = 'data-hk-eff';
-                    else if (c.isPD) cls = 'data-hk-pd-pa';
-                    else if (c.isPD_mm) cls = 'data-hk-pd-mm';
-                    html += `<td ${cls}>${c.f(row)}</td>`;
+                cols.forEach((c) => {
+                    html += `<td>${c.f(row)}</td>`;
                 });
                 html += '</tr>';
             });
@@ -5190,49 +5266,68 @@
             container.innerHTML = html;
         }
 
-        // Phase 5: Dynamic highlighting
-        function hkApplyHighlighting() {
+        // Phase 5: Filter data (Replaces Highlighting)
+        function hkApplyFilter() {
             const effMin = parseFloat(document.getElementById('hk-eff-min')?.value);
             const effMax = parseFloat(document.getElementById('hk-eff-max')?.value);
             const pdMin = parseFloat(document.getElementById('hk-pd-min')?.value);
             const pdMax = parseFloat(document.getElementById('hk-pd-max')?.value);
             const pdUnit = (document.getElementById('hk-pd-unit')?.value) || 'pa';
 
-            // Efficiency highlighting (blue)
-            document.querySelectorAll('[data-hk-eff]').forEach(td => {
-                td.classList.remove('hk-highlight-eff');
-                const val = parseFloat(td.textContent);
-                if (!isNaN(effMin) && !isNaN(effMax) && !isNaN(val)) {
-                    if (val >= effMin && val <= effMax) td.classList.add('hk-highlight-eff');
+            hkFilteredData = hkData.filter(row => {
+                let showRow = true;
+
+                // Cek syarat Efisiensi
+                if (!isNaN(effMin) || !isNaN(effMax)) {
+                    const eff = row.efficiency;
+                    if (!isNaN(effMin) && eff < effMin) showRow = false;
+                    if (!isNaN(effMax) && eff > effMax) showRow = false;
                 }
+
+                // Cek syarat Pressure Drop
+                if (showRow && (!isNaN(pdMin) || !isNaN(pdMax))) {
+                    // Ambil nilai PD berdasarkan tab aktif atau yang relevan.
+                    // Karena filter berlaku global, kita akan memeriksa semua 3 model PD jika tidak diketahu spesifiknya, 
+                    // tapi sebaiknya periksa satu metrik saja berdasarkan seleksi PD (S&L, Barth, atau Stairmand).
+                    // Namun, di tabel aslinya, filter memeriksa kolom yang aktif.
+                    // Untuk filter global, amannya kita periksa PD tertinggi yang paling konservatif, atau rata-rata,
+                    // atau cukup PD dari model aktif yang di chart. 
+                    // Lebih presisi: Karena ada 3 model PD berbeda, filter akan diaplikasikan ke "Pressure Drop aktif di chart", 
+                    // atau secara simplistik ambil nilai Lapple (karena paling standar) jika metric belum dipilih spesifik ke model PD.
+
+                    const metric = document.getElementById('hk-chart-metric')?.value || 'dp_sl';
+                    let pdVal = 0;
+                    if (metric === 'dp_barth') pdVal = row.DP_Barth;
+                    else if (metric === 'dp_stairmand') pdVal = row.DP_Stairmand;
+                    else pdVal = row.DP_SL; // Default to S&L
+
+                    if (pdUnit === 'mmh2o') pdVal = pdVal / 9.806;
+
+                    if (!isNaN(pdMin) && pdVal < pdMin) showRow = false;
+                    if (!isNaN(pdMax) && pdVal > pdMax) showRow = false;
+                }
+
+                return showRow;
             });
 
-            // Pressure drop highlighting (green)
-            const pdAttr = pdUnit === 'mmh2o' ? 'data-hk-pd-mm' : 'data-hk-pd-pa';
-            document.querySelectorAll('[data-hk-pd-pa],[data-hk-pd-mm]').forEach(td => {
-                td.classList.remove('hk-highlight-pd');
-            });
-            document.querySelectorAll(`[${pdAttr}]`).forEach(td => {
-                const val = parseFloat(td.textContent);
-                if (!isNaN(pdMin) && !isNaN(pdMax) && !isNaN(val)) {
-                    if (val >= pdMin && val <= pdMax) td.classList.add('hk-highlight-pd');
-                }
-            });
+            hkRenderActiveTable();
+            hkUpdateChart();
         }
 
         // Phase 6: Chart
         function hkUpdateChart() {
-            if (typeof Chart === 'undefined' || hkData.length === 0) return;
+            if (typeof Chart === 'undefined') return;
             const canvas = document.getElementById('hk-chart-canvas');
             if (!canvas) return;
             if (hkChartInstance) { hkChartInstance.destroy(); hkChartInstance = null; }
+            if (hkFilteredData.length === 0) return;
 
             const metric = (document.getElementById('hk-chart-metric')?.value) || 'eff';
             const dark = isDarkMode();
             const gridColor = dark ? 'rgba(148,163,184,0.15)' : 'rgba(100,116,139,0.12)';
             const tickColor = dark ? '#94a3b8' : '#64748b';
 
-            const labels = hkData.map((r, i) => i === 0 ? 'EXISTING' : `${r.varLabel.substr(0, 8)}-${r.methodLabel.substr(0, 8)}`);
+            const labels = hkFilteredData.map((r, i) => r.type === 'existing' ? 'EXISTING' : `${r.varLabel.substr(0, 8)}-${r.methodLabel.substr(0, 8)}`);
             const getValue = (r) => {
                 if (metric === 'eff') return r.efficiency;
                 if (metric === 'dp_sl') return r.DP_SL;
@@ -5240,13 +5335,16 @@
                 if (metric === 'dp_stairmand') return r.DP_Stairmand;
                 return 0;
             };
-            const values = hkData.map(getValue);
+            const values = hkFilteredData.map(getValue);
             const yLabel = metric === 'eff' ? 'Efisiensi (%)' : 'Pressure Drop (Pa)';
 
-            const bgColors = hkData.map((r, i) => {
+            const bgColors = hkFilteredData.map((r, i) => {
                 if (r.type === 'existing') return '#f59e0b';
                 if (r.type === 'custom') return '#10b981';
-                const groupIdx = Math.floor((i - 1) / 6) % 8;
+
+                // Cari index asli di hkData untuk tetap konsisten warnanya
+                const origIndex = hkData.indexOf(r);
+                const groupIdx = Math.floor((Math.max(0, origIndex - 1)) / 6) % 8;
                 const hues = [210, 30, 120, 270, 340, 170, 50, 300];
                 return `hsl(${hues[groupIdx]},70%,${dark ? '55%' : '45%'})`;
             });
@@ -5265,14 +5363,14 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: false, // Ensures canvas listens to parent container height
                     plugins: {
                         legend: { display: false },
                         tooltip: {
                             callbacks: {
                                 title: (items) => {
                                     const idx = items[0].dataIndex;
-                                    const r = hkData[idx];
+                                    const r = hkFilteredData[idx];
                                     return `${r.varLabel} — ${r.methodLabel}`;
                                 },
                                 label: (item) => `${yLabel}: ${item.parsed.y.toFixed(2)}`
@@ -5301,14 +5399,14 @@
                 alert('Library XLSX belum dimuat. Coba refresh halaman.');
                 return;
             }
-            if (hkData.length === 0) {
-                alert('Tidak ada data untuk diekspor.');
+            if (hkFilteredData.length === 0) {
+                alert('Tidak ada data tersaring untuk diekspor.');
                 return;
             }
             const wb = XLSX.utils.book_new();
             const tabNames = ['Efisiensi L&L', 'ΔP S&L', 'ΔP Barth', 'ΔP Stairmand'];
             HK_COLUMNS.forEach((cols, ti) => {
-                const rows = hkData.map(row => {
+                const rows = hkFilteredData.map(row => {
                     const obj = {};
                     cols.forEach(c => { obj[c.h] = c.f(row); });
                     return obj;
