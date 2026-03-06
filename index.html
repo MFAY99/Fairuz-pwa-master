@@ -2026,6 +2026,10 @@
                 History Keseluruhan — Analisis Komparasi
             </h2>
             <div class="flex items-center gap-2">
+                <select id="hk-flowrate-selector" onchange="hkSwitchFlowrate()"
+                    class="custom-input py-1 px-2 text-xs font-bold w-auto">
+                    <!-- Populated by JS -->
+                </select>
                 <button onclick="exportHKExcel()"
                     class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors">Export
                     Excel</button>
@@ -5123,7 +5127,9 @@
         // ===  HISTORY KESELURUHAN — Phases 2–7  ==============================
         // =====================================================================
 
-        let hkData = [];          // array of row objects
+        let hkData = [];          // array of row objects (pointer ke flowrate aktif)
+        let hkMultiFlowData = {};  // { "52000": [49 rows], "54000": [49 rows], ... }
+        let hkActiveFlowrate = ''; // key flowrate yang sedang ditampilkan
         let hkActiveTab = 0;     // 0..3
         let hkChartInstance = null;
 
@@ -5222,47 +5228,91 @@
         let hkFilteredData = []; // State for displayed rows
 
         function saveAllToHistoryKeseluruhan() {
-            // Collect EXISTING baseline from current form
+            // Collect EXISTING baseline geometry from current form
             const existingGeom = {
                 D: getVal('geom-D'), a: getVal('geom-a'), b: getVal('geom-b'),
                 De: getVal('geom-De'), S: getVal('geom-S'), h_cyl: getVal('geom-h'),
                 H: getVal('geom-H'), B: getVal('geom-B')
             };
-            const existingPhys = {
+            const basePhys = {
                 rho_p: getVal('phys-RhoP'), dp_um: getVal('phys-Dp'),
                 mu_x10: getVal('phys-Mu'), K: getVal('phys-K'), T: getVal('phys-T'),
-                flowrate: parseFloat(document.getElementById('phys-Flowrate').value) || 0,
                 multiple: Math.max(1, parseInt(document.getElementById('phys-Multiple').value) || 1)
             };
 
-            hkData = [];
+            // Langkah A: Baca pengaturan INTERVAL FLOWRATE dari UI utama
+            const flowrates = generateFlowrateArray();
+            // Jika flowrates kosong atau hanya 1 elemen, pastikan minimal ada 1 step
+            if (flowrates.length === 0) {
+                flowrates.push(parseFloat(document.getElementById('phys-Flowrate').value) || 0);
+            }
 
-            // Row 1: EXISTING
-            const existingCalc = hkCalcFull(existingGeom, existingPhys);
-            hkData.push({ varLabel: 'EXISTING', methodLabel: 'Manual Input', type: 'existing', ...existingCalc });
+            hkMultiFlowData = {};
 
-            // Rows 2-49: 8 variable groups × 6 ratio methods
-            HK_VAR_GROUPS.forEach(varGroup => {
-                HK_RATIO_ORDER.forEach(ratioKey => {
-                    const ratios = standardRatios[ratioKey];
-                    // Compute target variable value from ratio
-                    const geomMod = { ...existingGeom };
-                    const targetVal = existingGeom.D * ratios[varGroup.key];
-                    // Map key to geomMod property (h_cyl for h)
-                    if (varGroup.key === 'h') {
-                        geomMod.h_cyl = targetVal;
-                    } else {
-                        geomMod[varGroup.key] = targetVal;
-                    }
-                    const calc = hkCalcFull(geomMod, existingPhys);
-                    hkData.push({
-                        varLabel: varGroup.label,
-                        methodLabel: HK_RATIO_LABELS[ratioKey] || ratioKey,
-                        type: 'ratio',
-                        ...calc
+            flowrates.forEach(flowrateVal => {
+                const physObj = { ...basePhys, flowrate: flowrateVal };
+                const rows = [];
+
+                // Langkah B - Baris 1: EXISTING (geom manual + flowrate iterasi saat ini)
+                const existingCalc = hkCalcFull(existingGeom, physObj);
+                rows.push({ varLabel: 'EXISTING', methodLabel: 'Manual Input', type: 'existing', ...existingCalc });
+
+                // Langkah B - Baris 2-49: 8 variabel grup × 6 metode rasio
+                HK_VAR_GROUPS.forEach(varGroup => {
+                    HK_RATIO_ORDER.forEach(ratioKey => {
+                        const ratios = standardRatios[ratioKey];
+
+                        // Langkah C: Proporsi Silang
+                        // Acuan = variabel yang sedang diiterasi (varGroup.key)
+                        // baseD = Input_Manual_Acuan / Rasio_Acuan
+                        const acuanKey = varGroup.key;
+                        const acuanVal = acuanKey === 'h' ? existingGeom.h_cyl : existingGeom[acuanKey];
+                        const ratioAcuan = ratios[acuanKey]; // rasio untuk variabel acuan
+                        const baseD = acuanVal / Math.max(0.0001, ratioAcuan);
+
+                        // Hitung SEMUA 8 geometri dari baseD × rasio target
+                        const geomMod = {
+                            D: baseD * ratios.D,
+                            a: baseD * ratios.a,
+                            b: baseD * ratios.b,
+                            De: baseD * ratios.De,
+                            S: baseD * ratios.S,
+                            h_cyl: baseD * ratios.h,
+                            H: baseD * ratios.H,
+                            B: baseD * ratios.B
+                        };
+
+                        // Langkah D: Kalkulasi performa
+                        const calc = hkCalcFull(geomMod, physObj);
+                        rows.push({
+                            varLabel: varGroup.label,
+                            methodLabel: HK_RATIO_LABELS[ratioKey] || ratioKey,
+                            type: 'ratio',
+                            ...calc
+                        });
                     });
                 });
+
+                // Langkah E: Simpan ke state global per flowrate
+                const flowKey = String(flowrateVal);
+                hkMultiFlowData[flowKey] = rows;
             });
+
+            // Set flowrate aktif ke yang pertama
+            const flowKeys = Object.keys(hkMultiFlowData);
+            hkActiveFlowrate = flowKeys[0] || '';
+            hkData = hkMultiFlowData[hkActiveFlowrate] || [];
+
+            // Populate dropdown flowrate
+            const selector = document.getElementById('hk-flowrate-selector');
+            if (selector) {
+                selector.innerHTML = flowKeys.map(k => {
+                    const fLabel = Number(k).toLocaleString('id-ID');
+                    return `<option value="${k}"${k === hkActiveFlowrate ? ' selected' : ''}>Flowrate: ${fLabel} m³/jam</option>`;
+                }).join('');
+                // Sembunyikan dropdown jika hanya 1 flowrate
+                selector.style.display = flowKeys.length <= 1 ? 'none' : '';
+            }
 
             // Reset filter
             document.getElementById('hk-eff-min').value = '';
@@ -5271,6 +5321,17 @@
             document.getElementById('hk-pd-max').value = '';
 
             openHKOverlay();
+        }
+
+        // Fungsi saat user mengganti flowrate dari dropdown
+        function hkSwitchFlowrate() {
+            const sel = document.getElementById('hk-flowrate-selector');
+            if (!sel) return;
+            hkActiveFlowrate = sel.value;
+            hkData = hkMultiFlowData[hkActiveFlowrate] || [];
+            // Re-render sidebar, tabel, dan chart dengan data flowrate baru
+            hkRenderSidebar();
+            hkApplyFilter();
         }
 
         // Phase 5: Reset Filter JS function
