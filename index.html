@@ -1860,19 +1860,13 @@
     </div>
 
     <!-- Comparison Modal -->
-    <div id="comparison-modal"
-        class="fixed inset-0 z-50 hidden flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
-        <div
-            class="flex-shrink-0 px-4 py-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between">
+    <!-- Comparison Modal -->
+    <div id="comparison-modal" class="hk-overlay">
+        <div class="hk-header">
             <h2 class="text-base md:text-lg font-bold flex items-center gap-2">
                 🔀 Comparison Analysis
             </h2>
             <div class="flex items-center gap-2">
-                <select id="comp-pd-unit" onchange="updateComparisonDisplay(); updateComparisonChart();"
-                    class="custom-input py-1 px-2 text-xs w-auto">
-                    <option value="pa">Pa</option>
-                    <option value="mmh2o">mmH₂O</option>
-                </select>
                 <button onclick="closeComparisonView()"
                     class="p-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1883,71 +1877,132 @@
             </div>
         </div>
 
-        <div class="flex-grow overflow-y-auto p-4 md:p-6 space-y-6 max-w-6xl mx-auto w-full">
-            <div id="comp-product-headers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+        <div class="hk-body">
+            <!-- SIDEBAR -->
+            <div class="hk-sidebar">
+                <h3 class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-2">
+                    <svg aria-hidden="true" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Input & Tweak Geometri
+                </h3>
+                <div id="comp-sidebar-fields"></div>
 
-            <div
-                class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-x-auto shadow-sm">
-                <table class="w-full text-xs md:text-sm whitespace-nowrap">
-                    <thead id="comp-table-head"
-                        class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 uppercase text-xs">
-                    </thead>
-                    <tbody id="comp-table-body" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody>
-                </table>
-            </div>
-
-            <div
-                class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-sm font-bold">Visualisasi Perbandingan</h3>
-                    <select id="comp-chart-metric" onchange="updateComparisonChart()"
-                        class="custom-input py-1 px-2 text-xs w-auto">
-                        <option value="eff">Efisiensi (%)</option>
-                        <option value="pd_sl">ΔP Shepherd &amp; Lapple</option>
-                        <option value="pd_barth">ΔP Barth</option>
-                        <option value="pd_stairmand">ΔP Stairmand</option>
-                    </select>
-                </div>
-                <div id="comp-bar-chart" class="flex items-end gap-4 h-48 md:h-64 px-4"></div>
-            </div>
-
-            <div
-                class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-                <button onclick="toggleComparison3D()" id="comp-3d-toggle"
-                    class="w-full px-4 py-3 text-sm font-bold text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                    <span class="flex items-center gap-2">
-                        🎮 Preview 3D Model
-                        <span
-                            class="text-[10px] px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-md font-bold">
-                            Opsional
-                        </span>
-                    </span>
-                    <span id="comp-3d-status" class="text-xs text-slate-500">OFF</span>
+                <button onclick="compAddCustomRow()"
+                    class="w-full mt-3 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-colors flex justify-center items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Input Baris Baru
                 </button>
-                <div id="comp-3d-wrapper" class="hidden">
-                    <div
-                        class="flex flex-wrap items-center gap-2 px-3 py-2 border-t border-slate-200 dark:border-slate-800">
-                        <div class="flex items-center gap-1.5 overflow-x-auto flex-1 min-w-0" id="comp-3d-tabs"></div>
-                        <div class="flex items-center gap-2 flex-shrink-0">
-                            <button onclick="toggleCompGridMode()" id="comp-grid-btn"
-                                class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-colors flex items-center gap-1"
-                                style="background:var(--step-btn-bg);border:1px solid var(--step-btn-border);color:var(--step-btn-text)">
-                                &#8862; Grid
+                <div
+                    class="mt-4 p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] text-slate-500 dark:text-slate-400">
+                    <strong>Tips:</strong> Centang ☑ untuk membuka kunci variabel. Ubah nilainya, lalu klik "Input Baris
+                    Baru" untuk menambah data tweak ke tabel perbandingan.
+                </div>
+            </div>
+
+            <!-- MAIN AREA -->
+            <div class="hk-main">
+                <!-- Data Source Headers -->
+                <div id="comp-product-headers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+
+                <!-- Chart -->
+                <div class="hk-chart-box" id="comp-chart-box">
+                    <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+                        <h3 class="text-sm font-bold flex items-center gap-2">
+                            <svg aria-hidden="true" class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z">
+                                </path>
+                            </svg>
+                            Visualisasi Perbandingan
+                        </h3>
+                        <div class="flex items-center gap-2">
+                            <select id="comp-chart-metric" onchange="updateComparisonChart()"
+                                class="custom-input py-1 px-2 text-xs w-auto">
+                                <option value="eff">Efisiensi (%)</option>
+                                <option value="pd_sl">ΔP Shepherd & Lapple</option>
+                                <option value="pd_barth">ΔP Barth</option>
+                                <option value="pd_stairmand">ΔP Stairmand</option>
+                            </select>
+                            <select id="comp-pd-unit" onchange="compRenderActiveTable(); updateComparisonChart();"
+                                class="custom-input py-1 px-2 text-xs w-auto hidden">
+                                <option value="pa">Pa</option>
+                                <option value="mmh2o">mmH₂O</option>
+                            </select>
+                            <button onclick="compToggleChart()" id="comp-chart-toggle-btn"
+                                class="p-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded transition-colors"
+                                title="Minimize/Maximize">
+                                <svg class="w-4 h-4" id="comp-chart-toggle-icon" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 15l7-7 7 7"></path>
+                                </svg>
                             </button>
-                            <label
-                                class="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400">
-                                Speed
-                                <input type="range" id="comp-flow-speed" min="0.2" max="3" step="0.1" value="1.0"
-                                    class="w-14 md:w-20 accent-emerald-500">
-                            </label>
                         </div>
                     </div>
-                    <!-- Single product view (tab mode) -->
-                    <div id="comp-3d-container"
-                        class="w-full h-[300px] md:h-[400px] relative bg-gradient-to-b from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-950">
+                    <div class="hk-chart-body" id="comp-chart-body">
+                        <div id="comp-bar-chart" class="flex items-end gap-4 h-48 md:h-64 px-4 w-full"></div>
                     </div>
-                    <!-- Grid view (all products side-by-side) -->
-                    <div id="comp-3d-grid" class="p-2 gap-2 bg-slate-100 dark:bg-slate-950" style="display:none">
+                </div>
+
+                <!-- Tabs -->
+                <div class="hk-tabs" id="comp-tabs">
+                    <button class="hk-tab active" onclick="compSwitchTab(0)">Efisiensi L&L</button>
+                    <button class="hk-tab" onclick="compSwitchTab(1)">ΔP Shepherd & Lapple</button>
+                    <button class="hk-tab" onclick="compSwitchTab(2)">ΔP Barth</button>
+                    <button class="hk-tab" onclick="compSwitchTab(3)">ΔP Stairmand</button>
+                </div>
+
+                <!-- Tables -->
+                <div class="hk-table-wrap">
+                    <div id="comp-table-container"></div>
+                </div>
+
+                <!-- 3D Preview -->
+                <div
+                    class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm mt-4">
+                    <button onclick="toggleComparison3D()" id="comp-3d-toggle"
+                        class="w-full px-4 py-3 text-sm font-bold text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                        <span class="flex items-center gap-2">
+                            🎮 Preview 3D Model
+                            <span
+                                class="text-[10px] px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-md font-bold">
+                                Opsional
+                            </span>
+                        </span>
+                        <span id="comp-3d-status" class="text-xs text-slate-500">OFF</span>
+                    </button>
+                    <div id="comp-3d-wrapper" class="hidden">
+                        <div
+                            class="flex flex-wrap items-center gap-2 px-3 py-2 border-t border-slate-200 dark:border-slate-800">
+                            <div class="flex items-center gap-1.5 overflow-x-auto flex-1 min-w-0" id="comp-3d-tabs">
+                            </div>
+                            <div class="flex items-center gap-2 flex-shrink-0">
+                                <button onclick="toggleCompGridMode()" id="comp-grid-btn"
+                                    class="px-2.5 py-1 text-[10px] font-bold rounded-md transition-colors flex items-center gap-1"
+                                    style="background:var(--step-btn-bg);border:1px solid var(--step-btn-border);color:var(--step-btn-text)">
+                                    &#8862; Grid
+                                </button>
+                                <label
+                                    class="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                                    Speed
+                                    <input type="range" id="comp-flow-speed" min="0.2" max="3" step="0.1" value="1.0"
+                                        class="w-14 md:w-20 accent-emerald-500">
+                                </label>
+                            </div>
+                        </div>
+                        <div id="comp-3d-container"
+                            class="w-full h-[300px] md:h-[400px] relative bg-gradient-to-b from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-950">
+                        </div>
+                        <div id="comp-3d-grid" class="p-2 gap-2 bg-slate-100 dark:bg-slate-950" style="display:none">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2617,13 +2672,22 @@
 
             const safe = (v) => Number.isFinite(v) ? v : 0;
             return {
-                Vi: safe(Vi), efficiency: safe(efficiency), d50_um: safe(d50_um_val),
+                // Geometry (pass-through for comparison table)
+                D: safe(D), a: safe(a), b: safe(b), De: safe(De), S: safe(S), h_cyl: safe(h_cyl), H: safe(H), B: safe(B),
+                // Physical inputs (pass-through)
+                rho_p: safe(rho_p), dp_um: safe(dp_um), mu_x10: safe(mu_x10), mu: safe(mu), K: safe(K), T: safe(T),
+                rho_air: safe(rho_air),
+                // Calculated flow properties
+                Vi: safe(Vi), Q: safe(Q), MFR: safe(rho_air * Q),
+                efficiency: safe(efficiency), d50_um: safe(d50_um_val),
                 DP_SL: safe(DP_SL), DP_Barth: safe(DP_Barth), DP_Stairmand: safe(DP_Stairmand),
-                // Intermediate vars for step-by-step
-                l: safe(l), C: safe(C), CP: safe(CP), SP: safe(SP), Ne: safe(Ne),
+                // Intermediate vars for step-by-step & comparison
+                n: safe(n), l: safe(l), C_geom: safe(C), C: safe(C), CP: safe(CP), SP: safe(SP), Ne: safe(Ne),
                 Pdyn: safe(Pdyn), DH_SL: safe(DH_SL),
-                alpha: safe(alpha), lambda: lambda, ratio_barth: safe(ratio_barth), DH_Barth: safe(DH_Barth),
-                Area: safe(Area), phi: safe(phi), DH_Stairmand: safe(DH_Stairmand)
+                alpha: safe(alpha), lambda: lambda, ratio_barth: safe(ratio_barth),
+                denominator_barth: safe(denominator_barth), epsilon_e: safe(epsilon_e), epsilon_i: safe(epsilon_i),
+                DH_Barth: safe(DH_Barth),
+                Area: safe(Area), G_factor: safe(G_factor), phi: safe(phi), DH_Stairmand: safe(DH_Stairmand)
             };
         }
 
@@ -2733,12 +2797,8 @@
             const stairmandEl = document.getElementById('res-dp-stairmand');
             if (stairmandEl) stairmandEl.innerText = formatPD(r.DP_Stairmand);
 
-            // Update lastCalcResults for history saving
-            lastCalcResults = {
-                DP_SL: r.DP_SL, DP_Barth: r.DP_Barth, DP_Stairmand: r.DP_Stairmand,
-                efficiency: r.efficiency, efficiency_raw: r.efficiency,
-                d50_um: r.d50_um, Vi: r.Vi
-            };
+            // Update lastCalcResults for history saving (full object)
+            lastCalcResults = { ...r };
 
             // Update step-by-step calculation detail
             const stepsContainer = document.getElementById('calc-steps-panel');
@@ -3031,13 +3091,15 @@
             if (stairmandEl) stairmandEl.innerText = formatPD(dpStairmandSafe);
 
             lastCalcResults = {
-                DP_SL: dpSlSafe,
-                DP_Barth: dpBarthSafe,
-                DP_Stairmand: dpStairmandSafe,
-                efficiency: efficiencySafe,
-                efficiency_raw: efficiencyRaw,
+                D, a, b, De, S, h_cyl, H, B,
+                Vi: viSafe, Q, T, mu, mu_x10, rho_air, rho_p, dp, dp_um,
+                n, Ne, l, d_cone, C_geom: C, CP, SP,
                 d50_um: d50Safe,
-                Vi: viSafe
+                efficiency: efficiencySafe, efficiency_raw: efficiencyRaw,
+                MFR: rho_air * Q,
+                Pdyn, K, DH_SL, DP_SL: dpSlSafe,
+                alpha, lambda, ratio_barth, denominator_barth, epsilon_e, epsilon_i, DH_Barth, DP_Barth: dpBarthSafe,
+                Area, G_factor, phi, DH_Stairmand, DP_Stairmand: dpStairmandSafe
             };
 
             const stepsPanel = document.getElementById('calc-steps-panel');
@@ -3065,7 +3127,8 @@
             const stdEl = document.getElementById('std-type');
             const modeName = appMode === 'standard' ? stdEl.options[stdEl.selectedIndex].text : 'Manual Input';
             const productName = (document.getElementById('product-name').value || '').trim() || 'Unnamed';
-            return {
+            // Build base record from DOM inputs
+            const base = {
                 id: Date.now(),
                 productName: productName,
                 timestamp: new Date().toISOString(),
@@ -3085,6 +3148,18 @@
                 d50_raw: Number.isFinite(lastCalcResults.d50_um) ? lastCalcResults.d50_um : null,
                 vi_raw: Number.isFinite(lastCalcResults.Vi) ? lastCalcResults.Vi : null
             };
+            // Merge ALL intermediate calc properties from lastCalcResults
+            // This ensures Q, MFR, Pdyn, rho_gas, n_exp, l, d_cone, C_geom, CP, SP,
+            // DH_SL, ratio_barth, DH_Barth, epsilon_i, epsilon_e, G_factor, Area, phi,
+            // DH_Stairmand etc. are ALL preserved for the Comparison modal.
+            const safeCalc = {};
+            if (lastCalcResults && typeof lastCalcResults === 'object') {
+                for (const [k, v] of Object.entries(lastCalcResults)) {
+                    if (Number.isFinite(v)) safeCalc[k] = v;
+                }
+            }
+            // base properties take priority over lastCalcResults (in case of key overlap)
+            return { ...safeCalc, ...base };
         }
 
         async function saveNewToHistory() {
@@ -3473,111 +3548,226 @@
             }
         }
 
+        let compActiveTab = 0;
+
         function openComparisonView() {
             compRecords = selectedCompareIndices.map((idx) => calcHistory[idx]).filter(Boolean);
             if (compRecords.length < 2) return;
 
             compActiveProductIdx = 0;
+            compActiveTab = 0;
             const unitSelect = document.getElementById('comp-pd-unit');
-            if (unitSelect) unitSelect.value = pdDisplayUnit;
+            if (unitSelect) unitSelect.value = 'pa';
 
             const modal = document.getElementById('comparison-modal');
-            if (modal) modal.classList.remove('hidden');
+            if (modal) modal.classList.add('is-open');
 
             const historyModal = document.getElementById('history-modal');
             if (historyModal && !historyModal.classList.contains('hidden')) toggleHistoryModal();
 
-            updateComparisonDisplay();
+            compRenderSidebar();
+            compSwitchTab(0);
             updateComparisonChart();
         }
 
         function closeComparisonView() {
             const modal = document.getElementById('comparison-modal');
-            if (modal) modal.classList.add('hidden');
+            if (modal) modal.classList.remove('is-open');
             disposeComparison3D();
         }
 
-        function updateComparisonDisplay() {
-            if (!compRecords || compRecords.length < 2) return;
-
-            const unit = (document.getElementById('comp-pd-unit') || {}).value || 'pa';
-            const unitLabel = unit === 'mmh2o' ? 'mmH₂O' : 'Pa';
-            const convertPD = (pa) => unit === 'mmh2o' ? (pa / 9.806).toFixed(1) : Math.round(pa).toLocaleString();
-            const asFixed = (value, digits = 2) => {
-                const num = Number(value);
-                return Number.isFinite(num) ? num.toFixed(digits) : '-';
-            };
-
-            const headersDiv = document.getElementById('comp-product-headers');
-            const dark = isDarkMode();
-            if (headersDiv) {
-                headersDiv.innerHTML = compRecords.map((rec, idx) => {
-                    const c = COMP_COLORS[idx % COMP_COLORS.length];
-                    const bg = dark ? c.bgDark : c.bgLight;
-                    const txt = dark ? c.textDark : c.textLight;
-                    return `<div class="p-3 rounded-xl" style="border-left:4px solid ${c.borderColor};background:${bg}">
-                        <div class="text-xs text-slate-500">#${idx + 1}</div>
-                        <div class="font-bold" style="color:${txt}">${escapeHtml(rec.productName || 'Unnamed')}</div>
-                        <div class="text-[11px] text-slate-500">${escapeHtml(rec.mode || '-')} · D=${asFixed(rec.D, 3)}m</div>
-                    </div>`;
-                }).join('');
+        function compToggleChart() {
+            const chartBox = document.getElementById('comp-chart-box');
+            const icon = document.getElementById('comp-chart-toggle-icon');
+            if (chartBox && icon) {
+                chartBox.classList.toggle('is-minimized');
+                if (chartBox.classList.contains('is-minimized')) {
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>';
+                } else {
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>';
+                }
             }
+        }
 
-            const thead = document.getElementById('comp-table-head');
-            const tbody = document.getElementById('comp-table-body');
-            if (!thead || !tbody) return;
+        function compRenderSidebar() {
+            const container = document.getElementById('comp-sidebar-fields');
+            if (!container || compRecords.length === 0) return;
+            const ref = compRecords[0];
+            const fields = [
+                { key: 'D', label: 'Dia. Siklon (D)' },
+                { key: 'a', label: 'Tinggi Inlet (a)' },
+                { key: 'b', label: 'Lebar Inlet (b)' },
+                { key: 'De', label: 'Dia. Gas Out (De)' },
+                { key: 'S', label: 'Pipa Outlet (S)' },
+                { key: 'h_cyl', label: 'Total Silinder (h)', v: ref.h ?? ref.h_cyl },
+                { key: 'H', label: 'Total Siklon (H)' },
+                { key: 'B', label: 'Dia. Dust Out (B)' }
+            ];
+            container.innerHTML = fields.map(f => {
+                const val = (f.hasOwnProperty('v') ? f.v : ref[f.key] || 0).toFixed(4);
+                return `<div class="hk-sidebar-field">
+                    <input type="checkbox" id="comp-unlock-${f.key}" title="Buka kunci" onchange="compToggleLock('${f.key}')">
+                    <label>${f.label}</label>
+                    <input type="number" id="comp-val-${f.key}" value="${val}" step="0.001" disabled>
+                </div>`;
+            }).join('');
+        }
 
-            thead.innerHTML = `<tr>
-                <th class="px-3 py-2 text-left">Parameter</th>
-                ${compRecords.map((rec, idx) => { const c = COMP_COLORS[idx % COMP_COLORS.length]; const txt = dark ? c.textDark : c.textLight; return `<th class="px-3 py-2" style="color:${txt}">#${idx + 1} ${escapeHtml(rec.productName || 'Unnamed')}</th>`; }).join('')}
-            </tr>`;
+        function compToggleLock(key) {
+            const cb = document.getElementById('comp-unlock-' + key);
+            const inp = document.getElementById('comp-val-' + key);
+            if (cb && inp) inp.disabled = !cb.checked;
+        }
 
-            const rows = [
-                ['Mode', (rec) => escapeHtml(rec.mode || '-')],
-                // -- Geometry --
-                ['D (m)', (rec) => asFixed(rec.D, 3)],
-                ['a (m)', (rec) => asFixed(rec.a, 3)],
-                ['b (m)', (rec) => asFixed(rec.b, 3)],
-                ['De (m)', (rec) => asFixed(rec.De, 3)],
-                ['S (m)', (rec) => asFixed(rec.S, 3)],
-                ['h (m)', (rec) => asFixed(rec.h, 3)],
-                ['H (m)', (rec) => asFixed(rec.H, 3)],
-                ['B (m)', (rec) => asFixed(rec.B, 3)],
-                // -- Kondisi Operasional --
-                ['Vi (m/s)', (rec) => asFixed(rec.Vi_input ?? rec.Q, 2)],
-                ['T (K)', (rec) => asFixed(rec.T, 1)],
-                ['ρp (kg/m³)', (rec) => asFixed(rec.rhoP, 0)],
-                ['dp (μm)', (rec) => asFixed(rec.dp, 2)],
-                ['μ (×10⁻⁵)', (rec) => asFixed(rec.mu, 2)],
-                ['K', (rec) => asFixed(rec.K, 1)],
-                // -- Hasil --
-                ['Vi (m/s)', (rec) => asFixed(rec.vi_raw, 1)],
-                ['d50 (μm)', (rec) => asFixed(rec.d50_raw, 2)],
-                ['η (%)', (rec) => {
-                    const raw = Number(rec.eff_raw);
-                    if (Number.isFinite(raw)) return raw.toFixed(1);
-                    const legacy = parseFloat(String(rec.eff || '').replace(/[^0-9.-]/g, ''));
-                    return Number.isFinite(legacy) ? legacy.toFixed(1) : '-';
-                }],
-                [`ΔP S&L (${unitLabel})`, (rec) => {
-                    const pa = getRecordPressureDropPa(rec, 'dp_sl_raw');
-                    return Number.isFinite(pa) ? convertPD(pa) : '-';
-                }],
-                [`ΔP Barth (${unitLabel})`, (rec) => {
-                    const pa = getRecordPressureDropPa(rec, 'dp_barth_raw');
-                    return Number.isFinite(pa) ? convertPD(pa) : '-';
-                }],
-                [`ΔP Stairmand (${unitLabel})`, (rec) => {
-                    const pa = getRecordPressureDropPa(rec, 'dp_stairmand_raw');
-                    return Number.isFinite(pa) ? convertPD(pa) : '-';
-                }]
+        function compAddCustomRow() {
+            if (compRecords.length === 0) return;
+            const ref = compRecords[0];
+            const geomMod = {
+                D: parseFloat(document.getElementById('comp-val-D')?.value) || ref.D,
+                a: parseFloat(document.getElementById('comp-val-a')?.value) || ref.a,
+                b: parseFloat(document.getElementById('comp-val-b')?.value) || ref.b,
+                De: parseFloat(document.getElementById('comp-val-De')?.value) || ref.De,
+                S: parseFloat(document.getElementById('comp-val-S')?.value) || ref.S,
+                h_cyl: parseFloat(document.getElementById('comp-val-h_cyl')?.value) || ref.h || ref.h_cyl,
+                H: parseFloat(document.getElementById('comp-val-H')?.value) || ref.H,
+                B: parseFloat(document.getElementById('comp-val-B')?.value) || ref.B
+            };
+            const physObj = {
+                rho_p: ref.rhoP ?? ref.rho_p,
+                dp_um: ref.dp ?? ref.dp_um,
+                mu_x10: ref.mu ?? ref.mu_x10,
+                K: ref.K,
+                T: ref.T,
+                flowrate: ref.flowrate || ref.Q || 0,
+                multiple: ref.multiple || 1
+            };
+            const calc = hkCalcFull(geomMod, physObj);
+
+            // Format property mappings matching component records logic
+            const newRecord = {
+                productName: 'Custom Tweak',
+                mode: 'Modified',
+                type: 'custom',
+                eff_raw: calc.efficiency,
+                dp_sl_raw: calc.DP_SL,
+                dp_barth_raw: calc.DP_Barth,
+                dp_stairmand_raw: calc.DP_Stairmand,
+                h: geomMod.h_cyl, // Store back locally to h to normalize
+                ...calc
+            };
+            compRecords.push(newRecord);
+
+            compRenderActiveTable();
+            updateComparisonChart();
+            renderComp3DTabs();
+        }
+
+        function compSwitchTab(idx) {
+            compActiveTab = idx;
+            const tabs = document.querySelectorAll('#comp-tabs .hk-tab');
+            tabs.forEach((t, i) => {
+                t.classList.toggle('active', i === idx);
+            });
+            compRenderActiveTable();
+        }
+
+        function getUnifiedNum(r, key1, key2) {
+            const val = Number(r[key1] ?? r[key2]);
+            return Number.isFinite(val) ? val : 0;
+        }
+
+        function compRenderActiveTable() {
+            if (!compRecords || compRecords.length < 2) return;
+            const unit = (document.getElementById('comp-pd-unit') || {}).value || 'pa';
+            const pdDivisor = unit === 'mmh2o' ? 9.806 : 1;
+
+            const COMP_COLUMNS = [
+                [
+                    { h: 'Produk', f: (r, i) => `#${i + 1} ${escapeHtml(r.productName || 'Custom Tweak')}` },
+                    { h: 'Mode', f: r => escapeHtml(r.mode || r.methodLabel || '-') },
+                    { h: 'D (m)', f: r => getUnifiedNum(r, 'D').toFixed(4) },
+                    { h: 'a (m)', f: r => getUnifiedNum(r, 'a').toFixed(4) },
+                    { h: 'b (m)', f: r => getUnifiedNum(r, 'b').toFixed(4) },
+                    { h: 'De (m)', f: r => getUnifiedNum(r, 'De').toFixed(4) },
+                    { h: 'B (m)', f: r => getUnifiedNum(r, 'B').toFixed(4) },
+                    { h: 'h (m)', f: r => getUnifiedNum(r, 'h', 'h_cyl').toFixed(4) },
+                    { h: 'H (m)', f: r => getUnifiedNum(r, 'H').toFixed(4) },
+                    { h: 'S (m)', f: r => getUnifiedNum(r, 'S').toFixed(4) },
+                    { h: 'Vi (m/s)', f: r => getUnifiedNum(r, 'Vi_input', 'Vi').toFixed(3) },
+                    { h: 'Q (m³/s)', f: r => getUnifiedNum(r, 'Q').toFixed(6) },
+                    { h: 'T (K)', f: r => getUnifiedNum(r, 'T').toFixed(1) },
+                    { h: 'ρp (kg/m³)', f: r => getUnifiedNum(r, 'rhoP', 'rho_p').toFixed(1) },
+                    { h: 'dp (μm)', f: r => getUnifiedNum(r, 'dp', 'dp_um').toFixed(2) },
+                    { h: 'K', f: r => getUnifiedNum(r, 'K').toFixed(2) },
+                    { h: 'd50 (μm)', f: r => getUnifiedNum(r, 'd50_raw', 'd50_um').toFixed(2) },
+                    { h: 'η (%)', f: r => getUnifiedNum(r, 'eff_raw', 'efficiency').toFixed(2) }
+                ],
+                [
+                    { h: 'Produk', f: (r, i) => `#${i + 1} ${escapeHtml(r.productName || 'Custom Tweak')}` },
+                    { h: 'Mode', f: r => escapeHtml(r.mode || r.methodLabel || '-') },
+                    { h: 'a (m)', f: r => getUnifiedNum(r, 'a').toFixed(4) },
+                    { h: 'b (m)', f: r => getUnifiedNum(r, 'b').toFixed(4) },
+                    { h: 'De (m)', f: r => getUnifiedNum(r, 'De').toFixed(4) },
+                    { h: 'T (K)', f: r => getUnifiedNum(r, 'T').toFixed(1) },
+                    { h: 'Vi (m/s)', f: r => getUnifiedNum(r, 'Vi_input', 'Vi').toFixed(3) },
+                    { h: 'MFR (kg/s)', f: r => getUnifiedNum(r, 'MFR').toFixed(4) },
+                    { h: 'Pdyn (Pa)', f: r => getUnifiedNum(r, 'Pdyn').toFixed(2) },
+                    { h: 'K', f: r => getUnifiedNum(r, 'K').toFixed(1) },
+                    { h: 'ΔH S&L', f: r => getUnifiedNum(r, 'DH_SL').toFixed(4) },
+                    { h: 'ΔP S&L', f: r => (getRecordPressureDropPa(r, 'dp_sl_raw') / pdDivisor).toFixed(2) }
+                ],
+                [
+                    { h: 'Produk', f: (r, i) => `#${i + 1} ${escapeHtml(r.productName || 'Custom Tweak')}` },
+                    { h: 'Mode', f: r => escapeHtml(r.mode || r.methodLabel || '-') },
+                    { h: 'D (m)', f: r => getUnifiedNum(r, 'D').toFixed(4) },
+                    { h: 'a (m)', f: r => getUnifiedNum(r, 'a').toFixed(4) },
+                    { h: 'b (m)', f: r => getUnifiedNum(r, 'b').toFixed(4) },
+                    { h: 'H (m)', f: r => getUnifiedNum(r, 'H').toFixed(4) },
+                    { h: 'S (m)', f: r => getUnifiedNum(r, 'S').toFixed(4) },
+                    { h: 'T (K)', f: r => getUnifiedNum(r, 'T').toFixed(1) },
+                    { h: 'Vi (m/s)', f: r => getUnifiedNum(r, 'Vi_input', 'Vi').toFixed(3) },
+                    { h: 'Pdyn (Pa)', f: r => getUnifiedNum(r, 'Pdyn').toFixed(2) },
+                    { h: 'Ratio', f: r => getUnifiedNum(r, 'ratio_barth').toFixed(4) },
+                    { h: 'ΔP Barth', f: r => (getRecordPressureDropPa(r, 'dp_barth_raw') / pdDivisor).toFixed(2) }
+                ],
+                [
+                    { h: 'Produk', f: (r, i) => `#${i + 1} ${escapeHtml(r.productName || 'Custom Tweak')}` },
+                    { h: 'Mode', f: r => escapeHtml(r.mode || r.methodLabel || '-') },
+                    { h: 'D (m)', f: r => getUnifiedNum(r, 'D').toFixed(4) },
+                    { h: 'a (m)', f: r => getUnifiedNum(r, 'a').toFixed(4) },
+                    { h: 'b (m)', f: r => getUnifiedNum(r, 'b').toFixed(4) },
+                    { h: 'h (m)', f: r => getUnifiedNum(r, 'h', 'h_cyl').toFixed(4) },
+                    { h: 'H (m)', f: r => getUnifiedNum(r, 'H').toFixed(4) },
+                    { h: 'B (m)', f: r => getUnifiedNum(r, 'B').toFixed(4) },
+                    { h: 'Vi (m/s)', f: r => getUnifiedNum(r, 'Vi_input', 'Vi').toFixed(3) },
+                    { h: 'T (K)', f: r => getUnifiedNum(r, 'T').toFixed(1) },
+                    { h: 'f (gesekan)', f: r => getUnifiedNum(r, 'G_factor').toFixed(4) },
+                    { h: 'Pdyn (Pa)', f: r => getUnifiedNum(r, 'Pdyn').toFixed(2) },
+                    { h: 'ΔP Stairmand', f: r => (getRecordPressureDropPa(r, 'dp_stairmand_raw') / pdDivisor).toFixed(2) }
+                ]
             ];
 
-            tbody.innerHTML = rows.map(([label, getter]) => `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800">
-                <td class="px-3 py-2 font-semibold">${label}</td>
-                ${compRecords.map((rec) => `<td class="px-3 py-2 font-mono">${getter(rec)}</td>`).join('')}
-            </tr>`).join('');
+            const container = document.getElementById('comp-table-container');
+            const cols = COMP_COLUMNS[compActiveTab];
+
+            let html = '<table class="hk-table"><thead><tr>';
+            cols.forEach(c => { html += `<th>${c.h}</th>`; });
+            html += '</tr></thead><tbody class="divide-y divide-slate-200 dark:divide-slate-800">';
+
+            compRecords.forEach((row, ri) => {
+                const rowClass = row.type === 'custom' ? 'hk-custom' : (ri === 0 ? 'hk-existing' : '');
+                html += `<tr class="${rowClass}">`;
+                cols.forEach((c) => {
+                    html += `<td class="px-3 py-2 font-mono">${c.f(row, ri)}</td>`;
+                });
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+
+            container.innerHTML = html;
         }
+
+
 
         function updateComparisonChart() {
             const chart = document.getElementById('comp-bar-chart');
@@ -3588,29 +3778,27 @@
             }
 
             const metric = (document.getElementById('comp-chart-metric') || {}).value || 'eff';
-            const unit = (document.getElementById('comp-pd-unit') || {}).value || 'pa';
+            const unitSelect = document.getElementById('comp-pd-unit');
+            const unit = unitSelect ? unitSelect.value : 'pa';
+
+            if (metric === 'eff') {
+                if (unitSelect) unitSelect.classList.add('hidden');
+            } else {
+                if (unitSelect) unitSelect.classList.remove('hidden');
+            }
 
             const getValue = (rec) => {
+                const pdDivisor = unit === 'mmh2o' ? 9.806 : 1;
                 if (metric === 'eff') {
-                    const raw = Number(rec.eff_raw);
-                    if (Number.isFinite(raw)) return Math.max(0, raw);
-                    const legacy = parseFloat(String(rec.eff || '').replace(/[^0-9.-]/g, ''));
-                    return Number.isFinite(legacy) ? Math.max(0, legacy) : 0;
-                }
-                if (metric === 'pd_sl') {
-                    const pa = getRecordPressureDropPa(rec, 'dp_sl_raw');
-                    if (!Number.isFinite(pa)) return 0;
-                    return unit === 'mmh2o' ? Math.max(0, pa / 9.806) : Math.max(0, pa);
-                }
-                if (metric === 'pd_barth') {
-                    const pa = getRecordPressureDropPa(rec, 'dp_barth_raw');
-                    if (!Number.isFinite(pa)) return 0;
-                    return unit === 'mmh2o' ? Math.max(0, pa / 9.806) : Math.max(0, pa);
-                }
-                if (metric === 'pd_stairmand') {
-                    const pa = getRecordPressureDropPa(rec, 'dp_stairmand_raw');
-                    if (!Number.isFinite(pa)) return 0;
-                    return unit === 'mmh2o' ? Math.max(0, pa / 9.806) : Math.max(0, pa);
+                    const raw = Number(rec.eff_raw ?? rec.efficiency);
+                    if (Number.isFinite(raw)) return raw;
+                    return parseFloat(String(rec.eff || '').replace(/[^0-9.-]/g, '')) || 0;
+                } else if (metric === 'pd_sl') {
+                    return getRecordPressureDropPa(rec, 'dp_sl_raw') / pdDivisor;
+                } else if (metric === 'pd_barth') {
+                    return getRecordPressureDropPa(rec, 'dp_barth_raw') / pdDivisor;
+                } else if (metric === 'pd_stairmand') {
+                    return getRecordPressureDropPa(rec, 'dp_stairmand_raw') / pdDivisor;
                 }
                 return 0;
             };
@@ -3843,12 +4031,12 @@
                 const txt = tabDark ? c.textDark : c.textLight;
                 const activeBg = tabDark ? '#1e293b' : '#f1f5f9';
                 const activeBorder = tabDark ? '#475569' : '#cbd5e1';
-                const activeStyle = `color:${txt};background:${activeBg};border:1px solid ${activeBorder}`;
-                const inactiveStyle = `color:${tabDark ? '#94a3b8' : '#64748b'}`;
+                const activeStyle = `color:${txt}; background:${activeBg}; border: 1px solid ${activeBorder} `;
+                const inactiveStyle = `color:${tabDark ? '#94a3b8' : '#64748b'} `;
                 return `<button onclick="switchCompProduct(${idx})"
-                    class="px-3 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap"
-                    style="${active ? activeStyle : inactiveStyle}">
-                    #${idx + 1} ${escapeHtml(rec.productName || 'Unnamed')}
+            class="px-3 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap"
+            style="${active ? activeStyle : inactiveStyle}">
+                #${idx + 1} ${escapeHtml(rec.productName || 'Unnamed')}
                 </button>`;
             }).join('');
         }
@@ -4035,7 +4223,7 @@
             compRecords.forEach((rec, idx) => {
                 const c = COMP_COLORS[idx % COMP_COLORS.length];
                 const wrapper = document.createElement('div');
-                wrapper.style.cssText = `position:relative;border-radius:0.75rem;overflow:hidden;min-height:220px;border:2px solid ${c.borderColor};`;
+                wrapper.style.cssText = `position:relative;border-radius:0.75rem;overflow:hidden;min-height:300px;border:2px solid ${c.borderColor};`;
                 wrapper.style.background = dark ? 'linear-gradient(135deg,#1e293b,#020617)' : 'linear-gradient(135deg,#f1f5f9,#cbd5e1)';
 
                 // Label
@@ -4043,7 +4231,7 @@
                 label.style.cssText = `position:absolute;top:8px;left:8px;z-index:2;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:700;`;
                 label.style.background = dark ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.8)';
                 label.style.color = dark ? c.textDark : c.textLight;
-                label.textContent = `#${idx + 1} ${rec.productName || 'Unnamed'}`;
+                label.textContent = `#${idx + 1} ${rec.productName || 'Unnamed'} `;
                 wrapper.appendChild(label);
 
                 gridDiv.appendChild(wrapper);
@@ -4316,14 +4504,14 @@
 
         function loadExternalScript(src) {
             return new Promise((resolve, reject) => {
-                const existing = document.querySelector(`script[src="${src}"]`);
+                const existing = document.querySelector(`script[src = "${src}"]`);
                 if (existing) {
                     if (existing.dataset.loaded === 'true') {
                         resolve();
                         return;
                     }
                     existing.addEventListener('load', () => resolve(), { once: true });
-                    existing.addEventListener('error', () => reject(new Error(`Gagal memuat ${src}`)), { once: true });
+                    existing.addEventListener('error', () => reject(new Error(`Gagal memuat ${src} `)), { once: true });
                     return;
                 }
 
@@ -4335,7 +4523,7 @@
                     script.dataset.loaded = 'true';
                     resolve();
                 }, { once: true });
-                script.addEventListener('error', () => reject(new Error(`Gagal memuat ${src}`)), { once: true });
+                script.addEventListener('error', () => reject(new Error(`Gagal memuat ${src} `)), { once: true });
                 document.head.appendChild(script);
             });
         }
@@ -5104,10 +5292,10 @@
             container.innerHTML = fields.map(f => {
                 const val = (existing[f.key] || 0).toFixed(4);
                 return `<div class="hk-sidebar-field">
-                    <input type="checkbox" id="hk-unlock-${f.key}" title="Buka kunci" onchange="hkToggleLock('${f.key}')">
+                <input type="checkbox" id="hk-unlock-${f.key}" title="Buka kunci" onchange="hkToggleLock('${f.key}')">
                     <label>${f.label}</label>
                     <input type="number" id="hk-val-${f.key}" value="${val}" step="0.001" disabled>
-                </div>`;
+                    </div>`;
             }).join('');
         }
 
