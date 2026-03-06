@@ -5586,27 +5586,25 @@
                     if (!isNaN(effMax) && eff > effMax) showRow = false;
                 }
 
-                // Cek syarat Pressure Drop
+                // Cek syarat Pressure Drop (OR: lolos jika SALAH SATU dari 3 metode masuk range)
                 if (showRow && (!isNaN(pdMin) || !isNaN(pdMax))) {
-                    // Ambil nilai PD berdasarkan tab aktif atau yang relevan.
-                    // Karena filter berlaku global, kita akan memeriksa semua 3 model PD jika tidak diketahu spesifiknya, 
-                    // tapi sebaiknya periksa satu metrik saja berdasarkan seleksi PD (S&L, Barth, atau Stairmand).
-                    // Namun, di tabel aslinya, filter memeriksa kolom yang aktif.
-                    // Untuk filter global, amannya kita periksa PD tertinggi yang paling konservatif, atau rata-rata,
-                    // atau cukup PD dari model aktif yang di chart. 
-                    // Lebih presisi: Karena ada 3 model PD berbeda, filter akan diaplikasikan ke "Pressure Drop aktif di chart", 
-                    // atau secara simplistik ambil nilai Lapple (karena paling standar) jika metric belum dipilih spesifik ke model PD.
+                    const div = pdUnit === 'mmh2o' ? 9.806 : 1;
+                    const valSL = row.DP_SL / div;
+                    const valBarth = row.DP_Barth / div;
+                    const valStrmd = row.DP_Stairmand / div;
 
-                    const metric = document.getElementById('hk-chart-metric')?.value || 'dp_sl';
-                    let pdVal = 0;
-                    if (metric === 'dp_barth') pdVal = row.DP_Barth;
-                    else if (metric === 'dp_stairmand') pdVal = row.DP_Stairmand;
-                    else pdVal = row.DP_SL; // Default to S&L
+                    const inRange = (v) => {
+                        if (!isNaN(pdMin) && v < pdMin) return false;
+                        if (!isNaN(pdMax) && v > pdMax) return false;
+                        return true;
+                    };
 
-                    if (pdUnit === 'mmh2o') pdVal = pdVal / 9.806;
+                    const matchSL = inRange(valSL);
+                    const matchBarth = inRange(valBarth);
+                    const matchStrmd = inRange(valStrmd);
 
-                    if (!isNaN(pdMin) && pdVal < pdMin) showRow = false;
-                    if (!isNaN(pdMax) && pdVal > pdMax) showRow = false;
+                    // Loloskan jika SALAH SATU metode masuk range
+                    if (!(matchSL || matchBarth || matchStrmd)) showRow = false;
                 }
 
                 return showRow;
