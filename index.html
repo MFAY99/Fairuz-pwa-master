@@ -2089,9 +2089,28 @@
                             <option value="mmh2o">mmH₂O</option>
                         </select>
                     </div>
-                    <!-- Reset Filter Button -->
+                    <!-- Checkbox Metode PD -->
+                    <div
+                        class="flex items-center gap-3 text-[11px] font-semibold text-slate-600 dark:text-slate-300 flex-shrink-0">
+                        <label class="flex items-center gap-1 cursor-pointer select-none">
+                            <input type="checkbox" id="hk-chk-sl" checked onchange="hkApplyFilter()"
+                                class="w-3.5 h-3.5 accent-orange-500 cursor-pointer">
+                            S&L
+                        </label>
+                        <label class="flex items-center gap-1 cursor-pointer select-none">
+                            <input type="checkbox" id="hk-chk-barth" checked onchange="hkApplyFilter()"
+                                class="w-3.5 h-3.5 accent-rose-500 cursor-pointer">
+                            Barth
+                        </label>
+                        <label class="flex items-center gap-1 cursor-pointer select-none">
+                            <input type="checkbox" id="hk-chk-strmd" checked onchange="hkApplyFilter()"
+                                class="w-3.5 h-3.5 accent-purple-500 cursor-pointer">
+                            Stairmand
+                        </label>
+                    </div>
+                    <!-- Reset Filter Button (paling ujung kanan) -->
                     <button id="hk-reset-filter" onclick="hkResetFilter()"
-                        class="ml-auto p-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors border border-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 dark:border-red-800"
+                        class="ml-auto p-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors border border-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 dark:border-red-800 flex-shrink-0"
                         title="Reset Filter">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -5586,25 +5605,31 @@
                     if (!isNaN(effMax) && eff > effMax) showRow = false;
                 }
 
-                // Cek syarat Pressure Drop (OR: lolos jika SALAH SATU dari 3 metode masuk range)
+                // Cek syarat Pressure Drop (AND: semua metode yang dicentang wajib masuk range)
                 if (showRow && (!isNaN(pdMin) || !isNaN(pdMax))) {
                     const div = pdUnit === 'mmh2o' ? 9.806 : 1;
+                    const minP = !isNaN(pdMin) ? pdMin : -Infinity;
+                    const maxP = !isNaN(pdMax) ? pdMax : Infinity;
+
+                    // Baca status checkbox
+                    const useSL = document.getElementById('hk-chk-sl')?.checked ?? true;
+                    const useBarth = document.getElementById('hk-chk-barth')?.checked ?? true;
+                    const useStrmd = document.getElementById('hk-chk-strmd')?.checked ?? true;
+
+                    // Ambil nilai masing-masing metode
                     const valSL = row.DP_SL / div;
                     const valBarth = row.DP_Barth / div;
                     const valStrmd = row.DP_Stairmand / div;
 
-                    const inRange = (v) => {
-                        if (!isNaN(pdMin) && v < pdMin) return false;
-                        if (!isNaN(pdMax) && v > pdMax) return false;
-                        return true;
-                    };
+                    // Simpan hasil evaluasi metode yang dicentang ke dalam array
+                    const results = [];
+                    if (useSL) results.push(valSL >= minP && valSL <= maxP);
+                    if (useBarth) results.push(valBarth >= minP && valBarth <= maxP);
+                    if (useStrmd) results.push(valStrmd >= minP && valStrmd <= maxP);
 
-                    const matchSL = inRange(valSL);
-                    const matchBarth = inRange(valBarth);
-                    const matchStrmd = inRange(valStrmd);
-
-                    // Loloskan jika SALAH SATU metode masuk range
-                    if (!(matchSL || matchBarth || matchStrmd)) showRow = false;
+                    // Data lolos jika SEMUA metode yang dicentang bernilai TRUE
+                    const passPd = results.length > 0 ? results.every(res => res === true) : true;
+                    if (!passPd) showRow = false;
                 }
 
                 return showRow;
