@@ -1114,7 +1114,8 @@
 
         .hk-table-wrap {
             width: 100%;
-            overflow-x: auto;
+            overflow: auto;
+            max-height: 70vh;
             border: 1px solid #e2e8f0;
             border-radius: 0 0.75rem 0.75rem 0.75rem;
             background: #fff;
@@ -1132,25 +1133,43 @@
             white-space: nowrap;
         }
 
+        /* Sticky Header */
         .hk-table thead th {
             position: sticky;
             top: 0;
-            z-index: 2;
+            z-index: 40;
             padding: 0.4rem 0.6rem;
             text-align: left;
             font-weight: 800;
             font-size: 0.65rem;
-            text-transform: uppercase;
             letter-spacing: 0.04em;
             background: #f1f5f9;
             color: #475569;
             border-bottom: 2px solid #cbd5e1;
+            cursor: pointer;
+            user-select: none;
         }
 
         html.dark .hk-table thead th {
             background: #1e293b;
             color: #94a3b8;
             border-color: #334155;
+        }
+
+        /* Sticky Column No. */
+        .hk-table th.hk-sticky-no,
+        .hk-table td.hk-sticky-no {
+            position: sticky;
+            left: 0;
+            z-index: 10;
+            background: inherit;
+            min-width: 32px;
+            text-align: center;
+        }
+
+        /* Corner cell: header No. → highest z */
+        .hk-table thead th.hk-sticky-no {
+            z-index: 50;
         }
 
         .hk-table tbody td {
@@ -1187,6 +1206,24 @@
 
         html.dark .hk-table tbody tr.hk-custom td {
             background: rgba(16, 185, 129, 0.12);
+        }
+
+        /* Sorting icon */
+        .hk-sort-icon {
+            opacity: 0.4;
+            font-size: 0.6rem;
+            margin-left: 2px;
+        }
+
+        .hk-sort-icon.active {
+            opacity: 1;
+            color: #2563eb;
+        }
+
+        .hk-th-content {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
         }
 
         .hk-chart-box {
@@ -2047,18 +2084,47 @@
             <div class="hk-sidebar">
                 <h3 class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-3">🔧 Input & Tweak
                     Geometri</h3>
+                <!-- Poin 2: Input Nama Produk -->
+                <div class="mb-3">
+                    <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Nama
+                        Produk</label>
+                    <input type="text" id="hk-product-input" placeholder="Nama Produk / Label"
+                        class="custom-input mt-1 text-sm w-full" oninput="hkSyncProductBadge(this.value)">
+                </div>
                 <div id="hk-sidebar-fields"></div>
-                <button onclick="hkAddCustomRow()"
-                    class="w-full mt-3 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-colors flex justify-center items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                <!-- Poin 5: Tombol Reset -->
+                <button onclick="hkResetSidebar()"
+                    class="w-full mt-2 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 rounded-lg font-bold text-xs transition-colors flex justify-center items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                        </path>
                     </svg>
-                    Input Baris Baru
+                    Reset ke Nilai Awal
                 </button>
+                <!-- Poin 6: Dua Opsi Simpan -->
+                <div class="flex gap-2 mt-3">
+                    <button onclick="hkAddCustomRow()"
+                        class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-[11px] transition-colors flex justify-center items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
+                            </path>
+                        </svg>
+                        + Flowrate Ini
+                    </button>
+                    <button onclick="hkAddCustomRowAll()"
+                        class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-[11px] transition-colors flex justify-center items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
+                            </path>
+                        </svg>
+                        + Semua Flowrate
+                    </button>
+                </div>
                 <div
-                    class="mt-4 p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] text-slate-500 dark:text-slate-400">
-                    <strong>Tips:</strong> Centang ☑ untuk membuka kunci variabel. Ubah nilainya, lalu klik "Input Baris
-                    Baru" untuk menambah baris custom ke tabel.
+                    class="mt-3 p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] text-slate-500 dark:text-slate-400">
+                    <strong>Tips:</strong> Centang ☑ untuk membuka kunci variabel. Ubah nilainya, lalu klik salah satu
+                    tombol di atas untuk menambah baris custom ke tabel.
                 </div>
             </div>
             <!-- MAIN AREA -->
@@ -2160,12 +2226,20 @@
                         <div style="position:relative;height:280px;"><canvas id="hk-chart-canvas"></canvas></div>
                     </div>
                 </div>
-                <!-- Tabs -->
-                <div class="hk-tabs" id="hk-tabs">
-                    <button class="hk-tab active" onclick="hkSwitchTab(0)">Efisiensi L&L</button>
-                    <button class="hk-tab" onclick="hkSwitchTab(1)">ΔP Shepherd & Lapple</button>
-                    <button class="hk-tab" onclick="hkSwitchTab(2)">ΔP Barth</button>
-                    <button class="hk-tab" onclick="hkSwitchTab(3)">ΔP Stairmand</button>
+                <!-- Tabs + Mode Hapus -->
+                <div class="flex justify-between items-center gap-2 flex-wrap">
+                    <div class="hk-tabs" id="hk-tabs">
+                        <button class="hk-tab active" onclick="hkSwitchTab(0)">Efisiensi L&L</button>
+                        <button class="hk-tab" onclick="hkSwitchTab(1)">ΔP Shepherd & Lapple</button>
+                        <button class="hk-tab" onclick="hkSwitchTab(2)">ΔP Barth</button>
+                        <button class="hk-tab" onclick="hkSwitchTab(3)">ΔP Stairmand</button>
+                    </div>
+                    <label
+                        class="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 cursor-pointer select-none flex-shrink-0">
+                        <input type="checkbox" id="hk-delete-mode" onchange="hkRenderActiveTable()"
+                            class="w-3.5 h-3.5 accent-red-500 cursor-pointer">
+                        🗑️ Mode Hapus Custom
+                    </label>
                 </div>
                 <!-- Tables -->
                 <div class="hk-table-wrap">
@@ -3171,6 +3245,8 @@
                 T: getVal('phys-T'),
                 mu: getVal('phys-Mu'),
                 rhoP: getVal('phys-RhoP'),
+                flowrate: parseFloat(document.getElementById('phys-Flowrate').value) || 0,
+                multiple: Math.max(1, parseInt(document.getElementById('phys-Multiple').value) || 1),
                 eff_raw: Number.isFinite(lastCalcResults.efficiency) ? lastCalcResults.efficiency : null,
                 dp_sl_raw: Number.isFinite(lastCalcResults.DP_SL) ? lastCalcResults.DP_SL : null,
                 dp_barth_raw: Number.isFinite(lastCalcResults.DP_Barth) ? lastCalcResults.DP_Barth : null,
@@ -3543,6 +3619,8 @@
             if (rec.T !== undefined) document.getElementById('phys-T').value = rec.T;
             if (rec.mu !== undefined) document.getElementById('phys-Mu').value = rec.mu;
             if (rec.rhoP !== undefined) document.getElementById('phys-RhoP').value = rec.rhoP;
+            if (rec.flowrate !== undefined) document.getElementById('phys-Flowrate').value = rec.flowrate;
+            if (rec.multiple !== undefined) document.getElementById('phys-Multiple').value = rec.multiple;
 
             // Set mode AFTER filling values — standard mode's applyStandardRatios may
             // override geometry, so we re-apply saved values afterward
@@ -5154,6 +5232,8 @@
         let hkActiveProductName = ''; // nama produk dari form utama
         let hkActiveTab = 0;     // 0..3
         let hkChartInstance = null;
+        let hkSortState = { colIdx: null, dir: 'none' }; // Poin 4: sorting state
+        let hkSidebarState = {}; // Poin 5: { D: '2.37', a: '1.04', ... }
 
         const HK_RATIO_KEYS = Object.keys(standardRatios);  // 6 methods
         const HK_RATIO_LABELS = {
@@ -5352,10 +5432,12 @@
         function hkSwitchFlowrate() {
             const sel = document.getElementById('hk-flowrate-selector');
             if (!sel) return;
+            // Poin 5: Simpan sidebar state sebelum switch
+            hkSaveSidebarState();
             hkActiveFlowrate = sel.value;
             hkData = hkMultiFlowData[hkActiveFlowrate] || [];
-            // Re-render sidebar, tabel, dan chart dengan data flowrate baru
-            hkRenderSidebar();
+            // Re-render sidebar DENGAN restore state
+            hkRenderSidebar(true);
             hkApplyFilter();
         }
 
@@ -5365,6 +5447,12 @@
             document.getElementById('hk-eff-max').value = '';
             document.getElementById('hk-pd-min').value = '';
             document.getElementById('hk-pd-max').value = '';
+            // Reset checkboxes PD
+            const chkSL = document.getElementById('hk-chk-sl'); if (chkSL) chkSL.checked = true;
+            const chkBarth = document.getElementById('hk-chk-barth'); if (chkBarth) chkBarth.checked = true;
+            const chkStrmd = document.getElementById('hk-chk-strmd'); if (chkStrmd) chkStrmd.checked = true;
+            // Reset column filters & sort
+            hkSortState = { colIdx: null, dir: 'none' };
             hkApplyFilter();
         }
 
@@ -5378,7 +5466,13 @@
                 productDisplay.textContent = `Produk: ${hkActiveProductName}`;
                 productDisplay.classList.remove('hidden');
             }
-            hkRenderSidebar();
+            // Sinkronkan input produk di sidebar
+            const prodInput = document.getElementById('hk-product-input');
+            if (prodInput) prodInput.value = hkActiveProductName || '';
+            // Reset sidebar state & sort/filter
+            hkSidebarState = {};
+            hkSortState = { colIdx: null, dir: 'none' };
+            hkRenderSidebar(false);
             // Start by applying blank filter which copies data and renders everything
             hkApplyFilter();
         }
@@ -5402,29 +5496,47 @@
             }
         }
 
-        // Phase 3: Sidebar
-        function hkRenderSidebar() {
+        // Phase 3: Sidebar — Poin 5: State persisten
+        const HK_SIDEBAR_FIELDS = [
+            { key: 'D', label: 'Dia. Siklon (D)' },
+            { key: 'a', label: 'Tinggi Inlet (a)' },
+            { key: 'b', label: 'Lebar Inlet (b)' },
+            { key: 'De', label: 'Dia. Gas Out (De)' },
+            { key: 'S', label: 'Pipa Outlet (S)' },
+            { key: 'h_cyl', label: 'Total Silinder (h)' },
+            { key: 'H', label: 'Total Siklon (H)' },
+            { key: 'B', label: 'Dia. Dust Out (B)' }
+        ];
+
+        function hkSaveSidebarState() {
+            HK_SIDEBAR_FIELDS.forEach(f => {
+                const inp = document.getElementById('hk-val-' + f.key);
+                const cb = document.getElementById('hk-unlock-' + f.key);
+                if (inp) hkSidebarState[f.key] = { val: inp.value, unlocked: cb ? cb.checked : false };
+            });
+        }
+
+        function hkRenderSidebar(restoreState) {
             const container = document.getElementById('hk-sidebar-fields');
             if (!container || hkData.length === 0) return;
             const existing = hkData[0]; // EXISTING row
-            const fields = [
-                { key: 'D', label: 'Dia. Siklon (D)' },
-                { key: 'a', label: 'Tinggi Inlet (a)' },
-                { key: 'b', label: 'Lebar Inlet (b)' },
-                { key: 'De', label: 'Dia. Gas Out (De)' },
-                { key: 'S', label: 'Pipa Outlet (S)' },
-                { key: 'h_cyl', label: 'Total Silinder (h)' },
-                { key: 'H', label: 'Total Siklon (H)' },
-                { key: 'B', label: 'Dia. Dust Out (B)' }
-            ];
-            container.innerHTML = fields.map(f => {
-                const val = (existing[f.key] || 0).toFixed(4);
+            container.innerHTML = HK_SIDEBAR_FIELDS.map(f => {
+                const defaultVal = (existing[f.key] || 0).toFixed(4);
+                const saved = restoreState && hkSidebarState[f.key];
+                const val = saved ? saved.val : defaultVal;
+                const unlocked = saved ? saved.unlocked : false;
                 return `<div class="hk-sidebar-field">
-                <input type="checkbox" id="hk-unlock-${f.key}" title="Buka kunci" onchange="hkToggleLock('${f.key}')">
+                <input type="checkbox" id="hk-unlock-${f.key}" title="Buka kunci" onchange="hkToggleLock('${f.key}')"${unlocked ? ' checked' : ''}>
                     <label>${f.label}</label>
-                    <input type="number" id="hk-val-${f.key}" value="${val}" step="0.001" disabled>
+                    <input type="number" id="hk-val-${f.key}" value="${val}" step="0.001"${unlocked ? '' : ' disabled'}>
                     </div>`;
             }).join('');
+        }
+
+        // Poin 5: Reset sidebar ke nilai EXISTING asli
+        function hkResetSidebar() {
+            hkSidebarState = {};
+            hkRenderSidebar(false);
         }
 
         function hkToggleLock(key) {
@@ -5433,11 +5545,21 @@
             if (cb && inp) inp.disabled = !cb.checked;
         }
 
-        // Phase 7: Add custom row from sidebar
-        function hkAddCustomRow() {
-            if (hkData.length === 0) return;
+        // Poin 2: Sinkronkan badge produk dari sidebar input
+        function hkSyncProductBadge(val) {
+            hkActiveProductName = (val || '').trim() || 'Unnamed Product';
+            const badge = document.getElementById('hk-product-display');
+            if (badge) {
+                badge.textContent = `Produk: ${hkActiveProductName}`;
+                badge.classList.remove('hidden');
+            }
+        }
+
+        // Helper: ambil geometri dari sidebar inputs
+        function hkGetSidebarGeom() {
+            if (hkData.length === 0) return null;
             const existing = hkData[0];
-            const geomMod = {
+            return {
                 D: parseFloat(document.getElementById('hk-val-D')?.value) || existing.D,
                 a: parseFloat(document.getElementById('hk-val-a')?.value) || existing.a,
                 b: parseFloat(document.getElementById('hk-val-b')?.value) || existing.b,
@@ -5447,6 +5569,13 @@
                 H: parseFloat(document.getElementById('hk-val-H')?.value) || existing.H,
                 B: parseFloat(document.getElementById('hk-val-B')?.value) || existing.B
             };
+        }
+
+        // Poin 6a: Tambah custom row ke flowrate aktif saja
+        function hkAddCustomRow() {
+            const geomMod = hkGetSidebarGeom();
+            if (!geomMod || hkData.length === 0) return;
+            const existing = hkData[0];
             const physObj = {
                 rho_p: existing.rho_p, dp_um: existing.dp_um,
                 mu_x10: existing.mu_x10, K: existing.K, T: existing.T,
@@ -5457,6 +5586,37 @@
 
             // Re-apply filter on the new full dataset
             hkApplyFilter();
+        }
+
+        // Poin 6b: Tambah custom row ke SEMUA flowrate
+        function hkAddCustomRowAll() {
+            const geomMod = hkGetSidebarGeom();
+            if (!geomMod) return;
+            Object.keys(hkMultiFlowData).forEach(fk => {
+                const rows = hkMultiFlowData[fk];
+                if (!rows || rows.length === 0) return;
+                const existing = rows[0];
+                const physObj = {
+                    rho_p: existing.rho_p, dp_um: existing.dp_um,
+                    mu_x10: existing.mu_x10, K: existing.K, T: existing.T,
+                    flowrate: Number(fk), multiple: existing.multiple
+                };
+                const calc = hkCalcFull(geomMod, physObj);
+                rows.push({ varLabel: 'CUSTOM', methodLabel: 'Custom Input', type: 'custom', ...calc });
+            });
+            hkApplyFilter();
+        }
+
+        // Poin 7: Hapus baris custom dari data
+        function hkDeleteCustomRow(filteredIdx) {
+            const row = hkFilteredData[filteredIdx];
+            if (!row || row.type !== 'custom') return;
+            // Cari index asli di hkData via reference match
+            const realIdx = hkData.indexOf(row);
+            if (realIdx !== -1) {
+                hkData.splice(realIdx, 1);
+                hkApplyFilter();
+            }
         }
 
         // Phase 3: Tab switching
@@ -5564,7 +5724,7 @@
             ]
         ];
 
-        // Phase 4: Render active table
+        // Phase 4: Render active table — clean (No. + sorting + conditional Aksi)
         function hkRenderActiveTable() {
             const container = document.getElementById('hk-table-container');
             if (!container || hkFilteredData.length === 0) {
@@ -5572,19 +5732,73 @@
                 return;
             }
             const cols = HK_COLUMNS[hkActiveTab];
+            const deleteMode = document.getElementById('hk-delete-mode')?.checked || false;
             let html = '<table class="hk-table"><thead><tr>';
-            cols.forEach(c => { html += `<th>${c.h}</th>`; });
+            // Kolom No. (sticky)
+            html += '<th class="hk-sticky-no">No.</th>';
+            // Kolom data dengan sorting
+            cols.forEach((c, ci) => {
+                const sortIcon = hkSortState.colIdx === ci
+                    ? (hkSortState.dir === 'desc' ? '↓' : '↑')
+                    : '↕';
+                const sortClass = hkSortState.colIdx === ci ? 'active' : '';
+                html += `<th>
+                    <span class="hk-th-content" onclick="hkSortColumn(${ci})" title="Klik untuk sort">
+                        ${c.h} <span class="hk-sort-icon ${sortClass}">${sortIcon}</span>
+                    </span>
+                </th>`;
+            });
+            // Kolom Aksi: hanya jika Mode Hapus aktif
+            if (deleteMode) html += '<th>Aksi</th>';
             html += '</tr></thead><tbody>';
             hkFilteredData.forEach((row, ri) => {
                 const rowClass = row.type === 'existing' ? 'hk-existing' : (row.type === 'custom' ? 'hk-custom' : '');
                 html += `<tr class="${rowClass}" data-hk-row="${ri}">`;
+                // No. (sticky)
+                html += `<td class="hk-sticky-no" style="background:${row.type === 'existing' ? '#fef3c7' : row.type === 'custom' ? '#ecfdf5' : '#fff'}">${ri + 1}</td>`;
+                // Data columns
                 cols.forEach((c) => {
                     html += `<td>${c.f(row)}</td>`;
                 });
+                // Aksi column (kondisional)
+                if (deleteMode) {
+                    if (row.type === 'custom') {
+                        html += `<td><button onclick="hkDeleteCustomRow(${ri})" class="text-red-500 hover:text-red-700 text-xs font-bold" title="Hapus baris custom">🗑️</button></td>`;
+                    } else {
+                        html += '<td></td>';
+                    }
+                }
                 html += '</tr>';
             });
             html += '</tbody></table>';
             container.innerHTML = html;
+        }
+
+        // Sorting per kolom
+        function hkSortColumn(colIdx) {
+            const cols = HK_COLUMNS[hkActiveTab];
+            if (colIdx < 0 || colIdx >= cols.length) return;
+            // Cycle: none → desc → asc → none
+            if (hkSortState.colIdx !== colIdx) {
+                hkSortState = { colIdx, dir: 'desc' };
+            } else if (hkSortState.dir === 'desc') {
+                hkSortState.dir = 'asc';
+            } else {
+                hkSortState = { colIdx: null, dir: 'none' };
+            }
+            if (hkSortState.colIdx !== null) {
+                const col = cols[hkSortState.colIdx];
+                const mult = hkSortState.dir === 'desc' ? -1 : 1;
+                hkFilteredData.sort((a, b) => {
+                    const va = parseFloat(col.f(a));
+                    const vb = parseFloat(col.f(b));
+                    if (isNaN(va) && isNaN(vb)) return 0;
+                    if (isNaN(va)) return 1;
+                    if (isNaN(vb)) return -1;
+                    return (va - vb) * mult;
+                });
+            }
+            hkRenderActiveTable();
         }
 
         // Phase 5: Filter data (Replaces Highlighting)
